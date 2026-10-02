@@ -3,11 +3,474 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Quick Cart — Buy Smart. Sell Easy.</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f7f7f7;
+      color: #222;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar {
+      max-width: 1200px;
+      margin: auto;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      gap: 20px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 25px;
+      font-weight: 800;
+      color: #f97316;
+      white-space: nowrap;
+    }
+
+    .cart-icon {
+      width: 38px;
+      height: 38px;
+      background: #f97316;
+      color: white;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .search {
+      flex: 1;
+      max-width: 500px;
+      display: flex;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .search input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 13px 16px;
+      font-size: 15px;
+    }
+
+    .search button {
+      border: none;
+      background: #f97316;
+      color: white;
+      padding: 0 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .sell-btn {
+      background: #f97316;
+      color: white !important;
+      padding: 11px 18px;
+      border-radius: 9px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff7ed, #ffffff);
+      padding: 70px 20px;
+    }
+
+    .hero-content {
+      max-width: 1200px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 68px);
+      line-height: 1.05;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      color: #f97316;
+    }
+
+    .hero p {
+      font-size: 20px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      padding: 14px 25px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .primary-btn {
+      background: #f97316;
+      color: white;
+    }
+
+    .secondary-btn {
+      background: white;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    .section {
+      max-width: 1200px;
+      margin: auto;
+      padding: 50px 20px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .section-title h2 {
+      font-size: 28px;
+    }
+
+    .section-title a {
+      color: #f97316;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 15px;
+    }
+
+    .category {
+      background: white;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      padding: 22px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .category:hover {
+      transform: translateY(-3px);
+      border-color: #f97316;
+    }
+
+    .category-icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .category strong {
+      font-size: 14px;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .product {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+
+    .product-image {
+      height: 190px;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 55px;
+    }
+
+    .product-info {
+      padding: 16px;
+    }
+
+    .product-info h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .price {
+      color: #f97316;
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .location {
+      color: #777;
+      font-size: 13px;
+    }
+
+    .sell-section {
+      background: #111827;
+      color: white;
+      border-radius: 20px;
+      padding: 45px;
+      text-align: center;
+    }
+
+    .sell-section h2 {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .sell-section p {
+      color: #d1d5db;
+      margin-bottom: 25px;
+    }
+
+    footer {
+      background: #111;
+      color: white;
+      margin-top: 30px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: auto;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .footer-content p {
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      color: #ddd;
+      text-decoration: none;
+    }
+
+    .copyright {
+      text-align: center;
+      border-top: 1px solid #333;
+      padding: 18px;
+      color: #999;
+      font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+      .navbar {
+        height: auto;
+        padding: 15px;
+        flex-wrap: wrap;
+      }
+
+      .search {
+        order: 3;
+        max-width: none;
+        flex-basis: 100%;
+      }
+
+      .nav-links a:not(.sell-btn) {
+        display: none;
+      }
+
+      .hero {
+        padding: 50px 20px;
+      }
+
+      .sell-section {
+        padding: 30px 20px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Quick Cart</h1>
-  <p>Buy Smart. Sell Easy.</p>
-  <p>Your marketplace is coming together.</p>
+
+<header>
+  <nav class="navbar">
+    <div class="logo">
+      <div class="cart-icon">🛒</div>
+      Quick Cart
+    </div>
+
+    <div class="search">
+      <input type="text" placeholder="Search products, cars, phones and more...">
+      <button>Search</button>
+    </div>
+
+    <div class="nav-links">
+      <a href="#">Favorites</a>
+      <a href="#">Login</a>
+      <a href="#" class="sell-btn">Sell an Item</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1>Buy it. Sell it.<br><span>Find it on Quick Cart.</span></h1>
+
+    <p>Buy Smart. Sell Easy.</p>
+
+    <div class="hero-buttons">
+      <a href="#" class="primary-btn">Browse Products</a>
+      <a href="#" class="secondary-btn">Start Selling</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">
+    <h2>Browse Categories</h2>
+    <a href="#">View All</a>
+  </div>
+
+  <div class="categories">
+    <div class="category"><div class="category-icon">📱</div><strong>Phones</strong></div>
+    <div class="category"><div class="category-icon">💻</div><strong>Computers</strong></div>
+    <div class="category"><div class="category-icon">🚗</div><strong>Cars & Vehicles</strong></div>
+    <div class="category"><div class="category-icon">👗</div><strong>Fashion</strong></div>
+    <div class="category"><div class="category-icon">🛋️</div><strong>Furniture</strong></div>
+    <div class="category"><div class="category-icon">🎮</div><strong>Gaming</strong></div>
+    <div class="category"><div class="category-icon">🏠</div><strong>Home & Garden</strong></div>
+    <div class="category"><div class="category-icon">👶</div><strong>Baby & Kids</strong></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">
+    <h2>Featured Listings</h2>
+    <a href="#">View All</a>
+  </div>
+
+  <div class="products">
+
+    <div class="product">
+      <div class="product-image">📱</div>
+      <div class="product-info">
+        <h3>Smartphone</h3>
+        <div class="price">$299</div>
+        <div class="location">📍 Abu Dhabi</div>
+      </div>
+    </div>
+
+    <div class="product">
+      <div class="product-image">💻</div>
+      <div class="product-info">
+        <h3>Modern Laptop</h3>
+        <div class="price">$550</div>
+        <div class="location">📍 Dubai</div>
+      </div>
+    </div>
+
+    <div class="product">
+      <div class="product-image">🛋️</div>
+      <div class="product-info">
+        <h3>Modern Sofa</h3>
+        <div class="price">$180</div>
+        <div class="location">📍 Abu Dhabi</div>
+      </div>
+    </div>
+
+    <div class="product">
+      <div class="product-image">🎮</div>
+      <div class="product-info">
+        <h3>Gaming Console</h3>
+        <div class="price">$350</div>
+        <div class="location">📍 Dubai</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="sell-section">
+    <h2>Have something to sell?</h2>
+    <p>Turn your unused items into cash with Quick Cart.</p>
+    <a href="#" class="primary-btn">Sell an Item</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-content">
+    <div>
+      <div class="logo">
+        <div class="cart-icon">🛒</div>
+        Quick Cart
+      </div>
+      <p>Buy Smart. Sell Easy.</p>
+    </div>
+
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Safety</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+  </div>
+
+  <div class="copyright">
+    © 2026 Quick Cart. All rights reserved.
+  </div>
+</footer>
+
 </body>
 </html>
