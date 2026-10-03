@@ -341,7 +341,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const SUPABASE_URL = "https://dgnkmkyueqgbiahztuux.supabase.co";
+const SUPABASE_URL = "https://dgnkmkyuegbjahztuux.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
 
   const { createClient } = supabase;
@@ -353,6 +353,58 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_
 
   console.log("Quick Cart connected to Supabase");
 document.addEventListener("DOMContentLoaded", async () => {
+  const productsContainer = document.getElementById("featured-products");
+
+  const { data, error } = await supabaseClient
+    .from("listings")
+    .select("*")
+    .eq("status", "Active")
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.error("Supabase listings error:", error);
+    productsContainer.innerHTML = `
+      <div class="product">
+        <div class="product-info">
+          <h3>Unable to load listings</h3>
+          <div class="location">Please try again later.</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  console.log("Quick Cart listings from Supabase:", data);
+
+  if (!data || data.length === 0) {
+    productsContainer.innerHTML = `
+      <div class="product">
+        <div class="product-image">🛒</div>
+        <div class="product-info">
+          <h3>No listings yet</h3>
+          <div class="location">Be the first to sell on Quick Cart.</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  productsContainer.innerHTML = data.map(listing => `
+    <div class="product">
+      <div class="product-image">🛒</div>
+      <div class="product-info">
+        <h3>${listing.title || "Untitled Listing"}</h3>
+        <div class="price">
+          ${listing.currency || "USD"} ${listing.price ?? ""}
+        </div>
+        <div class="location">
+          📍 ${listing.location || "Location not specified"}
+        </div>
+      </div>
+    </div>
+  `).join("");
+});
   const { data, error } = await supabaseClient
     .from("listings")
     .select("*")
