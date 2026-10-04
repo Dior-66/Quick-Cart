@@ -405,18 +405,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     </div>
   `).join("");
 });
-  const { data, error } = await supabaseClient
-    .from("listings")
-    .select("*")
-    .limit(10);
-
-  if (error) {
-    console.error("Supabase listings error:", error);
-    return;
-  }
-
-  console.log("Quick Cart listings from Supabase:", data);
-});
 </script>
 </head>
 
