@@ -356,7 +356,7 @@ window.openListing = function(id) {
   window.location.href = "listing.html?id=" + encodeURIComponent(id);
 };
 
-document.addEventListener("DOMContentLoaded", async () => {X
+document.addEventListener("DOMContentLoaded", async () => {
   const productsContainer = document.getElementById("featured-products");
 
   const { data, error } = await supabaseClient
