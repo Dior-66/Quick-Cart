@@ -390,7 +390,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   productsContainer.innerHTML = data.map(listing => `
-    <div class="product">
+    <div class="product" onclick="openListing('${listing.id}')" style="cursor:pointer;">
       <div class="product-image">🛒</div>
       <div class="product-info">
         <h3>${listing.title || "Untitled Listing"}</h3>
@@ -402,8 +402,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
       </div>
     </div>
-  `).join("");
-});
+).join("");
+
+function openListing(id) {
+  window.location.href = "listing.html?id=" + encodeURIComponent(id);
+}
 </script>
 </head>
 
