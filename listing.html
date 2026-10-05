@@ -436,7 +436,7 @@
             .from("listing_images")
             .select("*")
             .eq("listing_id", listingId)
-            .order("sort_order", {
+            .order("display_order", {
               ascending: true
             });
 
