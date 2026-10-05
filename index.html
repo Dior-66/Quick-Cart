@@ -364,7 +364,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (error) {
     console.error("Supabase listings error:", error);
     productsContainer.innerHTML = `
-      <div class="product">
+      <div class="product" onclick="openListing('${listing.id}')" style="cursor:pointer;">
         <div class="product-info">
           <h3>Unable to load listings</h3>
           <div class="location">Please try again later.</div>
@@ -402,11 +402,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
       </div>
     </div>
-).join("");
+
+
+</div>
+</div>
+`).join("");
 
 function openListing(id) {
   window.location.href = "listing.html?id=" + encodeURIComponent(id);
 }
+
 </script>
 </head>
 
