@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quick Cart - Listing</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Quick Cart — Product</title>
 
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       background: #f7f7f7;
       color: #222;
     }
@@ -22,12 +22,16 @@
     header {
       background: white;
       border-bottom: 1px solid #eee;
-      padding: 18px 5%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .navbar {
       max-width: 1200px;
       margin: auto;
+      min-height: 72px;
+      padding: 12px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -36,30 +40,31 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 12px;
-      color: #ff6b00;
-      font-size: 28px;
-      font-weight: bold;
+      gap: 10px;
+      color: #f97316;
+      font-size: 25px;
+      font-weight: 800;
     }
 
     .cart-icon {
-      width: 48px;
-      height: 48px;
-      background: #ff6b00;
-      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #f97316;
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 25px;
+      font-size: 21px;
     }
 
-    .back {
-      color: #ff6b00;
+    .back-top {
+      color: #333;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 600;
     }
 
-    main {
+    .container {
       max-width: 1100px;
       margin: 40px auto;
       padding: 0 20px;
@@ -67,209 +72,603 @@
 
     .card {
       background: white;
-      border-radius: 18px;
-      padding: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #eee;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.05);
     }
 
-    .image-box {
-      width: 100%;
-      min-height: 350px;
-      background: #f1f2f4;
-      border-radius: 15px;
+    .gallery {
+      background: #f3f4f6;
+      min-height: 420px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 100px;
-      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 420px;
+      object-fit: contain;
+      display: none;
+      background: #f3f4f6;
+    }
+
+    .placeholder {
+      font-size: 80px;
+    }
+
+    .content {
+      padding: 35px;
     }
 
     h1 {
-      margin: 0 0 15px;
-      font-size: 34px;
+      font-size: 40px;
+      margin-bottom: 15px;
+      line-height: 1.15;
     }
 
     .price {
-      color: #ff6b00;
-      font-size: 30px;
-      font-weight: bold;
+      color: #f97316;
+      font-size: 32px;
+      font-weight: 800;
       margin-bottom: 15px;
     }
 
     .location,
     .condition {
       color: #666;
-      margin: 8px 0;
       font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .condition strong {
+      color: #333;
+    }
+
+    .description-title {
+      margin-top: 30px;
+      margin-bottom: 12px;
+      font-size: 22px;
     }
 
     .description {
-      margin-top: 25px;
-      line-height: 1.7;
       color: #444;
+      font-size: 17px;
+      line-height: 1.7;
     }
 
     .buttons {
       display: flex;
-      gap: 12px;
-      margin-top: 30px;
+      gap: 15px;
+      margin-top: 35px;
       flex-wrap: wrap;
     }
 
-    button {
+    .button {
       border: none;
       border-radius: 10px;
       padding: 14px 25px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      background: #ff6b00;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .primary {
+      background: #f97316;
       color: white;
     }
 
-    button.secondary {
+    .secondary {
       background: #eee;
       color: #222;
     }
 
     .status {
+      max-width: 700px;
+      margin: 80px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
       text-align: center;
-      padding: 60px 20px;
+    }
+
+    .status h2 {
+      margin-bottom: 12px;
+    }
+
+    .status p {
       color: #666;
+      margin-bottom: 20px;
+    }
+
+    .gallery-controls {
+      position: absolute;
+      bottom: 15px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .thumb {
+      width: 60px;
+      height: 45px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 2px solid white;
+      cursor: pointer;
+      background: white;
+    }
+
+    .thumb.active {
+      border-color: #f97316;
+    }
+
+    footer {
+      margin-top: 50px;
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 25px;
     }
 
     @media (max-width: 700px) {
-      .logo {
-        font-size: 22px;
+      .container {
+        margin: 20px auto;
+        padding: 0 12px;
       }
 
-      .card {
-        padding: 20px;
+      .gallery {
+        min-height: 300px;
       }
 
-      .image-box {
-        min-height: 250px;
+      .main-image {
+        height: 300px;
+      }
+
+      .content {
+        padding: 25px 20px;
       }
 
       h1 {
+        font-size: 30px;
+      }
+
+      .price {
         font-size: 27px;
+      }
+
+      .navbar {
+        padding: 12px 15px;
+      }
+
+      .back-top {
+        font-size: 14px;
       }
     }
   </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
-<header>
-  <div class="navbar">
-    <div class="logo">
-      <div class="cart-icon">🛒</div>
-      Quick Cart
+  <header>
+    <nav class="navbar">
+
+      <a href="index.html" class="logo">
+        <div class="cart-icon">🛒</div>
+        Quick Cart
+      </a>
+
+      <a href="index.html" class="back-top">
+        ← Back to Listings
+      </a>
+
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <div id="content">
+
+      <div class="status">
+        <h2>Loading listing...</h2>
+        <p>Please wait.</p>
+      </div>
+
     </div>
 
-    <a class="back" href="index.html">← Back to listings</a>
-  </div>
-</header>
+  </main>
 
-<main>
-  <div id="content" class="status">
-    Loading listing...
-  </div>
-</main>
+  <footer>
+    © 2026 Quick Cart — Buy Smart. Sell Easy.
+  </footer>
 
-<script>
-  const SUPABASE_URL = "https://dgnkmkyueqgbiahztuux.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
+  <script>
 
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+    /* =========================
+       SUPABASE
+    ========================= */
 
-  const params = new URLSearchParams(window.location.search);
-  const listingId = params.get("id");
+    const SUPABASE_URL =
+      "https://dgnkmkyueqgbiahztuux.supabase.co";
 
-  async function loadListing() {
-    const content = document.getElementById("content");
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
 
-    if (!listingId) {
-      content.innerHTML = `
-        <div class="status">
-          <h2>Listing not found</h2>
-          <p>No listing ID was provided.</p>
-          <a class="back" href="index.html">← Back to listings</a>
-        </div>
-      `;
-      return;
+    const { createClient } = supabase;
+
+    const supabaseClient = createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+    /* =========================
+       GET LISTING ID
+    ========================= */
+
+    const params =
+      new URLSearchParams(window.location.search);
+
+    const listingId =
+      params.get("id");
+
+
+    /* =========================
+       ESCAPE HTML
+    ========================= */
+
+    function escapeHtml(value) {
+
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
     }
 
-    const { data, error } = await supabaseClient
-      .from("listings")
-      .select("*")
-      .eq("id", listingId)
-      .eq("status", "Active")
-      .single();
 
-    if (error || !data) {
-      console.error("Listing error:", error);
+    /* =========================
+       IMAGE URL
+    ========================= */
 
-      content.innerHTML = `
-        <div class="status">
-          <h2>Listing not found</h2>
-          <p>This listing may no longer be available.</p>
-          <a class="back" href="index.html">← Back to listings</a>
-        </div>
-      `;
-      return;
+    function getImageUrl(image) {
+
+      if (!image) {
+        return null;
+      }
+
+      return (
+        image.image_url ||
+        image.url ||
+        image.public_url ||
+        image.storage_url ||
+        image.path ||
+        null
+      );
+
     }
 
-    content.innerHTML = `
-      <div class="card">
-        <div class="image-box">🛒</div>
 
-        <h1>${escapeHtml(data.title || "Untitled Listing")}</h1>
+    /* =========================
+       LOAD LISTING
+    ========================= */
 
-        <div class="price">
-          ${escapeHtml(data.currency || "USD")} ${escapeHtml(String(data.price ?? ""))}
-        </div>
+    async function loadListing() {
 
-        <div class="location">
-          📍 ${escapeHtml(data.location || "Location not specified")}
-        </div>
+      const content =
+        document.getElementById("content");
 
-        <div class="condition">
-          Condition: ${escapeHtml(data.condition || "Not specified")}
-        </div>
 
-        <div class="description">
-          <h3>Description</h3>
-          <p>${escapeHtml(data.description || "No description provided.")}</p>
-        </div>
+      if (!listingId) {
 
-        <div class="buttons">
-          <button onclick="alert('Messaging will be connected next.')">
-            Message Seller
-          </button>
+        content.innerHTML = `
+          <div class="status">
+            <h2>Listing not found</h2>
+            <p>No listing ID was provided.</p>
+            <a class="button primary" href="index.html">
+              Back to Listings
+            </a>
+          </div>
+        `;
 
-          <button class="secondary" onclick="history.back()">
-            Back
-          </button>
-        </div>
-      </div>
-    `;
-  }
+        return;
+      }
 
-  function escapeHtml(value) {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
 
-  loadListing();
-</script>
+      try {
+
+        /* GET LISTING */
+
+        const listingResult =
+          await supabaseClient
+            .from("listings")
+            .select("*")
+            .eq("id", listingId)
+            .eq("status", "Active")
+            .single();
+
+
+        const listing =
+          listingResult.data;
+
+        const listingError =
+          listingResult.error;
+
+
+        if (listingError || !listing) {
+
+          console.error(
+            "Listing error:",
+            listingError
+          );
+
+          content.innerHTML = `
+            <div class="status">
+              <h2>Listing not found</h2>
+              <p>This listing may no longer be available.</p>
+              <a class="button primary" href="index.html">
+                Back to Listings
+              </a>
+            </div>
+          `;
+
+          return;
+        }
+
+
+        /* GET IMAGES */
+
+        let images = [];
+
+        const imageResult =
+          await supabaseClient
+            .from("listing_images")
+            .select("*")
+            .eq("listing_id", listingId)
+            .order("sort_order", {
+              ascending: true
+            });
+
+
+        if (!imageResult.error && imageResult.data) {
+          images = imageResult.data;
+        }
+
+
+        console.log(
+          "Quick Cart listing:",
+          listing
+        );
+
+        console.log(
+          "Quick Cart listing images:",
+          images
+        );
+
+
+        /* IMAGE URLS */
+
+        const imageUrls =
+          images
+            .map(getImageUrl)
+            .filter(Boolean);
+
+
+        content.innerHTML = `
+
+          <div class="card">
+
+            <div class="gallery">
+
+              ${
+                imageUrls.length > 0
+
+                ? `
+                  <img
+                    id="mainImage"
+                    class="main-image"
+                    src="${escapeHtml(imageUrls[0])}"
+                    alt="${escapeHtml(listing.title)}"
+                    style="display:block;"
+                  >
+
+                  <div class="gallery-controls">
+
+                    ${imageUrls.map((url, index) => `
+                      <img
+                        class="thumb ${index === 0 ? "active" : ""}"
+                        src="${escapeHtml(url)}"
+                        alt="Product image ${index + 1}"
+                        onclick="changeImage(${index})"
+                      >
+                    `).join("")}
+
+                  </div>
+                `
+
+                : `
+                  <div class="placeholder">
+                    🛒
+                  </div>
+                `
+              }
+
+            </div>
+
+
+            <div class="content">
+
+              <h1>
+                ${escapeHtml(
+                  listing.title || "Untitled Listing"
+                )}
+              </h1>
+
+
+              <div class="price">
+                ${escapeHtml(
+                  listing.currency || "USD"
+                )}
+                ${escapeHtml(
+                  String(listing.price ?? "")
+                )}
+              </div>
+
+
+              <div class="location">
+                📍
+                ${escapeHtml(
+                  listing.location ||
+                  "Location not specified"
+                )}
+              </div>
+
+
+              ${
+                listing.condition
+                ? `
+                  <div class="condition">
+                    <strong>Condition:</strong>
+                    ${escapeHtml(listing.condition)}
+                  </div>
+                `
+                : ""
+              }
+
+
+              <h2 class="description-title">
+                Description
+              </h2>
+
+
+              <div class="description">
+                ${escapeHtml(
+                  listing.description ||
+                  "No description provided."
+                )}
+              </div>
+
+
+              <div class="buttons">
+
+                <button
+                  class="button primary"
+                  onclick="messageSeller()"
+                >
+                  Message Seller
+                </button>
+
+
+                <a
+                  class="button secondary"
+                  href="index.html"
+                >
+                  ← Back
+                </a>
+
+              </div>
+
+            </div>
+
+          </div>
+        `;
+
+
+        window.quickCartImages =
+          imageUrls;
+
+
+      } catch (error) {
+
+        console.error(
+          "Unexpected listing error:",
+          error
+        );
+
+        content.innerHTML = `
+          <div class="status">
+            <h2>Something went wrong</h2>
+            <p>Please refresh the page and try again.</p>
+            <a class="button primary" href="index.html">
+              Back to Listings
+            </a>
+          </div>
+        `;
+      }
+    }
+
+
+    /* =========================
+       CHANGE IMAGE
+    ========================= */
+
+    function changeImage(index) {
+
+      const images =
+        window.quickCartImages || [];
+
+      if (!images[index]) {
+        return;
+      }
+
+      const mainImage =
+        document.getElementById("mainImage");
+
+      if (mainImage) {
+
+        mainImage.src =
+          images[index];
+
+        mainImage.style.display =
+          "block";
+      }
+
+
+      document
+        .querySelectorAll(".thumb")
+        .forEach(function(thumb, i) {
+
+          thumb.classList.toggle(
+            "active",
+            i === index
+          );
+
+        });
+
+    }
+
+
+    /* =========================
+       MESSAGE SELLER
+    ========================= */
+
+    function messageSeller() {
+
+      alert(
+        "Message Seller will be connected to Quick Cart messaging next."
+      );
+
+    }
+
+
+    /* =========================
+       START
+    ========================= */
+
+    loadListing();
+
+  </script>
 
 </body>
 </html>
