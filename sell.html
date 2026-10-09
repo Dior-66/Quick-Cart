@@ -3,477 +3,658 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f97316">
   <title>Sell an Item | Quick Cart</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * { box-sizing: border-box; }
-
-    :root {
-      --orange: #f97316;
-      --dark-orange: #ea580c;
-      --border: #e5e7eb;
-      --muted: #6b7280;
-    }
-
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: #f8fafc;
       color: #222;
     }
-
     header {
       background: white;
-      border-bottom: 1px solid var(--border);
-      padding: 16px 5%;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 17px 5%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 15px;
+      flex-wrap: wrap;
     }
-
     .brand {
-      color: var(--orange);
       font-size: 25px;
       font-weight: 800;
+      color: #f97316;
       text-decoration: none;
     }
-
-    header a.home {
+    .home {
       color: #333;
       text-decoration: none;
       font-weight: 700;
     }
-
     main {
       max-width: 800px;
       margin: 35px auto;
       padding: 0 18px;
     }
-
-    .intro { margin-bottom: 22px; }
-
     h1 { font-size: 32px; margin-bottom: 8px; }
-
-    .intro p { color: var(--muted); margin-top: 0; }
-
-    .form-card {
+    .subtitle { color: #6b7280; line-height: 1.6; }
+    .card {
       background: white;
-      border: 1px solid var(--border);
+      border: 1px solid #e5e7eb;
       border-radius: 16px;
-      padding: 28px;
-      box-shadow: 0 8px 25px rgba(0,0,0,.04);
+      padding: 25px;
+      margin: 22px 0;
+      box-shadow: 0 6px 22px rgba(0,0,0,.04);
     }
-
-    .field { margin-bottom: 20px; }
-
+    h2 { margin-top: 0; font-size: 22px; }
+    .field { margin-bottom: 18px; }
     label {
       display: block;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
-
-    .required { color: var(--orange); }
-
     input, select, textarea {
-      display: block;
       width: 100%;
-      padding: 13px;
+      padding: 12px;
       border: 1px solid #d1d5db;
       border-radius: 9px;
       background: white;
       font: inherit;
-      outline-color: var(--orange);
     }
-
-    textarea { min-height: 120px; resize: vertical; }
-
-    .two-columns {
+    textarea { min-height: 110px; resize: vertical; }
+    .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
+      gap: 16px;
     }
-
-    .upload-box {
-      border: 2px dashed #fdba74;
-      background: #fff7ed;
-      border-radius: 12px;
-      padding: 25px 15px;
-      text-align: center;
-    }
-
-    .upload-box p { color: var(--muted); font-size: 13px; }
-
-    input[type="file"] {
-      border: 0;
-      padding: 8px 0;
-    }
-
-    .preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .preview img {
-      width: 90px;
-      height: 90px;
-      object-fit: contain;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-
-    .submit-btn {
-      width: 100%;
-      border: 0;
-      border-radius: 9px;
-      padding: 15px;
-      color: white;
-      background: var(--orange);
-      font-size: 16px;
-      font-weight: 800;
+    button {
+      font: inherit;
       cursor: pointer;
     }
-
-    .submit-btn:hover { background: var(--dark-orange); }
-    .submit-btn:disabled { opacity: .6; cursor: wait; }
-
+    .btn {
+      padding: 12px 17px;
+      border: 1px solid #e5e7eb;
+      border-radius: 9px;
+      background: white;
+      font-weight: 700;
+    }
+    .primary {
+      background: #f97316;
+      color: white;
+      border-color: #f97316;
+    }
+    .primary:hover { background: #ea580c; }
+    .full { width: 100%; }
+    button:disabled { opacity: .6; cursor: wait; }
+    .auth-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .auth-tabs button { flex: 1; }
+    .auth-tabs .selected {
+      background: #fff7ed;
+      border-color: #f97316;
+      color: #ea580c;
+    }
     .message {
-      margin-top: 16px;
+      display: none;
       padding: 13px;
       border-radius: 9px;
-      display: none;
+      margin: 15px 0;
       overflow-wrap: anywhere;
+      line-height: 1.5;
     }
-
-    .message.success {
-      display: block;
-      background: #dcfce7;
-      color: #166534;
-    }
-
     .message.error {
       display: block;
       background: #fee2e2;
       color: #991b1b;
     }
-
-    .note {
-      color: var(--muted);
+    .message.success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+    .hidden { display: none !important; }
+    .upload {
+      background: #fff7ed;
+      border: 2px dashed #fdba74;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .hint {
+      color: #6b7280;
       font-size: 13px;
       line-height: 1.6;
-      margin-top: 15px;
     }
-
+    .preview {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .preview img {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: white;
+    }
+    .account {
+      background: #fff7ed;
+      padding: 12px;
+      border-radius: 9px;
+      overflow-wrap: anywhere;
+      margin-bottom: 20px;
+    }
     footer {
       text-align: center;
       padding: 25px;
-      color: var(--muted);
+      color: #6b7280;
       font-size: 13px;
     }
-
     @media (max-width: 600px) {
-      .two-columns { grid-template-columns: 1fr; gap: 0; }
-      .form-card { padding: 19px; }
+      .grid { grid-template-columns: 1fr; gap: 0; }
+      .card { padding: 18px; }
       h1 { font-size: 27px; }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <a class="brand" href="./index.html">🛒 Quick Cart</a>
-    <a class="home" href="./index.html">← Back to Home</a>
-  </header>
+<header>
+  <a class="brand" href="./index.html">🛒 Quick Cart</a>
+  <a class="home" href="./index.html">← Back to Home</a>
+</header>
 
-  <main>
-    <div class="intro">
-      <h1>Sell an Item</h1>
-      <p>Share your product with buyers on Quick Cart.</p>
+<main>
+  <h1>Sell an Item</h1>
+  <p class="subtitle">Sign in to your seller account, then list your product on Quick Cart.</p>
+
+  <div id="pageMessage" class="message" role="status" aria-live="polite"></div>
+
+  <section id="authCard" class="card">
+    <h2>Seller Account</h2>
+    <p class="subtitle">Sign in with your existing account or create a new account.</p>
+
+    <div class="auth-tabs">
+      <button type="button" id="loginTab" class="btn selected">Log In</button>
+      <button type="button" id="signupTab" class="btn">Sign Up</button>
     </div>
 
-    <div class="form-card">
-      <form id="listingForm">
-        <div class="field">
-          <label for="title">Product title <span class="required">*</span></label>
-          <input id="title" name="title" maxlength="120" required
-                 placeholder="e.g. Gradient Infuser Bottle">
-        </div>
+    <form id="authForm">
+      <div id="nameField" class="field hidden">
+        <label for="fullName">Full name</label>
+        <input id="fullName" type="text" maxlength="100" autocomplete="name">
+      </div>
 
-        <div class="two-columns">
-          <div class="field">
-            <label for="price">Price (USD) <span class="required">*</span></label>
-            <input id="price" name="price" type="number"
-                   min="0.01" max="999999999" step="0.01"
-                   required placeholder="15.00">
-          </div>
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" type="email" required autocomplete="email"
+               placeholder="you@example.com">
+      </div>
 
-          <div class="field">
-            <label for="category">Category <span class="required">*</span></label>
-            <select id="category" name="category" required>
-              <option value="">Choose category</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Phones">Phones</option>
-              <option value="Computers">Computers</option>
-              <option value="Cars & Vehicles">Cars & Vehicles</option>
-              <option value="Fashion">Fashion</option>
-              <option value="Furniture">Furniture</option>
-              <option value="Gaming">Gaming</option>
-              <option value="Home & Garden">Home & Garden</option>
-              <option value="Baby & Kids">Baby & Kids</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-        </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" required minlength="6"
+               autocomplete="current-password" placeholder="At least 6 characters">
+      </div>
 
-        <div class="two-columns">
-          <div class="field">
-            <label for="condition">Condition <span class="required">*</span></label>
-            <select id="condition" name="condition" required>
-              <option value="">Choose condition</option>
-              <option value="New">New</option>
-              <option value="Like New">Like New</option>
-              <option value="Good">Good</option>
-              <option value="Fair">Fair</option>
-              <option value="Used">Used</option>
-            </select>
-          </div>
+      <button id="authButton" class="btn primary full" type="submit">Log In</button>
+    </form>
 
-          <div class="field">
-            <label for="location">Location <span class="required">*</span></label>
-            <input id="location" name="location" maxlength="100"
-                   required placeholder="e.g. Abu Dhabi, UAE">
-          </div>
-        </div>
+    <p class="hint">
+      If you create an account, Supabase may ask you to confirm your email before
+      you can log in. Never share your password with anyone.
+    </p>
+  </section>
 
-        <div class="field">
-          <label for="description">Product description <span class="required">*</span></label>
-          <textarea id="description" name="description" maxlength="5000"
-                    required placeholder="Describe your product, its features and condition..."></textarea>
-        </div>
-
-        <div class="field">
-          <label for="images">Product photos</label>
-          <div class="upload-box">
-            <div style="font-size:35px">📸</div>
-            <strong>Add photos of your product</strong>
-            <p>Select up to 5 images, maximum 5 MB each.</p>
-            <input id="images" name="images" type="file"
-                   accept="image/jpeg,image/png,image/webp,image/gif"
-                   multiple>
-            <div class="preview" id="imagePreview"></div>
-          </div>
-        </div>
-
-        <button class="submit-btn" id="submitButton" type="submit">
-          Publish Listing
-        </button>
-
-        <div class="message" id="formMessage" role="status" aria-live="polite"></div>
-
-        <p class="note">
-          Your listing will be saved to Quick Cart. Publishing requires the
-          appropriate Supabase database and Storage permissions. Do not enter
-          passwords or private account information here.
-        </p>
-      </form>
+  <section id="sellerCard" class="card hidden">
+    <h2>Your Seller Account</h2>
+    <div class="account">
+      Signed in as <strong id="sellerEmail"></strong>
     </div>
-  </main>
+    <button type="button" id="logoutButton" class="btn">Log Out</button>
+  </section>
 
-  <footer>Quick Cart — Buy Smart. Sell Easy.</footer>
+  <section id="listingCard" class="card hidden">
+    <h2>Product Details</h2>
 
-  <script>
-    const SUPABASE_URL = "https://dgnkmkyueqgbiahztuux.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
+    <form id="listingForm">
+      <div class="field">
+        <label for="title">Product title *</label>
+        <input id="title" required maxlength="120"
+               placeholder="e.g. Gradient Infuser Bottle">
+      </div>
 
-    const client = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+      <div class="grid">
+        <div class="field">
+          <label for="price">Price (USD) *</label>
+          <input id="price" type="number" min="0.01" max="999999999"
+                 step="0.01" required placeholder="15.00">
+        </div>
 
-    const form = document.getElementById("listingForm");
-    const imageInput = document.getElementById("images");
-    const preview = document.getElementById("imagePreview");
-    const message = document.getElementById("formMessage");
-    const submitButton = document.getElementById("submitButton");
+        <div class="field">
+          <label for="category">Category *</label>
+          <select id="category" required>
+            <option value="">Choose category</option>
+            <option>Electronics</option>
+            <option>Phones</option>
+            <option>Computers</option>
+            <option>Cars &amp; Vehicles</option>
+            <option>Fashion</option>
+            <option>Furniture</option>
+            <option>Gaming</option>
+            <option>Home &amp; Garden</option>
+            <option>Baby &amp; Kids</option>
+            <option>Other</option>
+          </select>
+        </div>
 
-    function showMessage(text, type) {
-      message.textContent = text;
-      message.className = "message " + type;
+        <div class="field">
+          <label for="condition">Condition *</label>
+          <select id="condition" required>
+            <option value="">Choose condition</option>
+            <option>New</option>
+            <option>Like New</option>
+            <option>Good</option>
+            <option>Fair</option>
+            <option>Used</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="location">Location *</label>
+          <input id="location" required maxlength="100"
+                 placeholder="e.g. Abu Dhabi, UAE">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="description">Product description</label>
+        <textarea id="description" maxlength="5000"
+                  placeholder="Describe your product and its features..."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="photos">Product photos</label>
+        <div class="upload">
+          <input id="photos" type="file"
+                 accept="image/jpeg,image/png,image/webp"
+                 multiple>
+          <p class="hint">Choose up to 5 JPG, PNG, or WebP images. Maximum 5 MB each.</p>
+          <div id="preview" class="preview"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>
+          <input id="allowOffers" type="checkbox" style="width:auto">
+          Allow buyers to make offers
+        </label>
+      </div>
+
+      <button id="publishButton" type="submit" class="btn primary full">
+        Publish Listing
+      </button>
+    </form>
+  </section>
+</main>
+
+<footer>Quick Cart — Buy Smart. Sell Easy.</footer>
+
+<script>
+  const SUPABASE_URL = "https://dgnkmkyueqgbiahztuux.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
+
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const pageMessage = document.getElementById("pageMessage");
+  const authCard = document.getElementById("authCard");
+  const sellerCard = document.getElementById("sellerCard");
+  const listingCard = document.getElementById("listingCard");
+  const authForm = document.getElementById("authForm");
+  const listingForm = document.getElementById("listingForm");
+
+  let authMode = "login";
+
+  function showMessage(text, type) {
+    pageMessage.textContent = text;
+    pageMessage.className = "message " + type;
+    pageMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function clearMessage() {
+    pageMessage.textContent = "";
+    pageMessage.className = "message";
+  }
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    clearMessage();
+
+    document.getElementById("loginTab").classList.toggle("selected", mode === "login");
+    document.getElementById("signupTab").classList.toggle("selected", mode === "signup");
+    document.getElementById("nameField").classList.toggle("hidden", mode !== "signup");
+    document.getElementById("fullName").required = mode === "signup";
+    document.getElementById("authButton").textContent =
+      mode === "login" ? "Log In" : "Create Account";
+    document.getElementById("password").autocomplete =
+      mode === "login" ? "current-password" : "new-password";
+  }
+
+  async function updateSessionView() {
+    const { data, error } = await db.auth.getSession();
+
+    if (error) {
+      showMessage("Could not check your login: " + error.message, "error");
+      return;
     }
 
-    imageInput.addEventListener("change", function() {
-      preview.replaceChildren();
+    const user = data.session ? data.session.user : null;
 
-      const files = Array.from(imageInput.files || []);
+    authCard.classList.toggle("hidden", !!user);
+    sellerCard.classList.toggle("hidden", !user);
+    listingCard.classList.toggle("hidden", !user);
 
-      if (files.length > 5) {
-        imageInput.value = "";
-        showMessage("Please select no more than 5 images.", "error");
-        return;
-      }
+    if (user) {
+      document.getElementById("sellerEmail").textContent = user.email || "Signed-in seller";
+    }
+  }
 
-      for (const file of files) {
-        if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
-          imageInput.value = "";
-          preview.replaceChildren();
-          showMessage("Each photo must be an image no larger than 5 MB.", "error");
-          return;
+  document.getElementById("loginTab").addEventListener("click", function() {
+    setAuthMode("login");
+  });
+
+  document.getElementById("signupTab").addEventListener("click", function() {
+    setAuthMode("signup");
+  });
+
+  authForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+    clearMessage();
+
+    const button = document.getElementById("authButton");
+    button.disabled = true;
+    button.textContent = "Please wait…";
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    try {
+      if (authMode === "login") {
+        const result = await db.auth.signInWithPassword({ email, password });
+
+        if (result.error) throw result.error;
+
+        authForm.reset();
+        await updateSessionView();
+        showMessage("You are logged in. You can now publish a listing.", "success");
+      } else {
+        const fullName = document.getElementById("fullName").value.trim();
+
+        const result = await db.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName }
+          }
+        });
+
+        if (result.error) throw result.error;
+
+        if (result.data.session) {
+          authForm.reset();
+          await updateSessionView();
+          showMessage("Account created. You can now continue.", "success");
+        } else {
+          showMessage(
+            "Account created. Check your email for a confirmation link. After confirming, return here and log in.",
+            "success"
+          );
+          setAuthMode("login");
         }
       }
+    } catch (error) {
+      console.error("Authentication error:", error);
+      showMessage(error.message || "Authentication failed.", "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = authMode === "login" ? "Log In" : "Create Account";
+    }
+  });
 
-      files.forEach(function(file) {
-        const img = document.createElement("img");
-        img.alt = "Selected product photo";
-        img.src = URL.createObjectURL(file);
-        preview.appendChild(img);
-      });
+  document.getElementById("logoutButton").addEventListener("click", async function() {
+    const result = await db.auth.signOut();
 
-      message.className = "message";
+    if (result.error) {
+      showMessage("Could not log out: " + result.error.message, "error");
+      return;
+    }
+
+    await updateSessionView();
+    showMessage("You have logged out.", "success");
+  });
+
+  const photoInput = document.getElementById("photos");
+  const preview = document.getElementById("preview");
+
+  photoInput.addEventListener("change", function() {
+    preview.replaceChildren();
+    clearMessage();
+
+    const files = Array.from(photoInput.files || []);
+
+    if (files.length > 5) {
+      photoInput.value = "";
+      showMessage("Please choose no more than 5 photos.", "error");
+      return;
+    }
+
+    for (const file of files) {
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+          file.size > 5 * 1024 * 1024) {
+        photoInput.value = "";
+        preview.replaceChildren();
+        showMessage("Use JPG, PNG, or WebP images no larger than 5 MB each.", "error");
+        return;
+      }
+    }
+
+    files.forEach(function(file) {
+      const image = document.createElement("img");
+      image.alt = "Product photo preview";
+      image.src = URL.createObjectURL(file);
+      preview.appendChild(image);
     });
+  });
 
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
-      message.className = "message";
+  listingForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+    clearMessage();
 
-      const files = Array.from(imageInput.files || []);
+    const publishButton = document.getElementById("publishButton");
+    publishButton.disabled = true;
+    publishButton.textContent = "Publishing…";
+
+    let savedListing = null;
+    let photoUploadFailed = false;
+
+    try {
+      const sessionResult = await db.auth.getSession();
+
+      if (sessionResult.error) throw sessionResult.error;
+
+      const user = sessionResult.data.session &&
+        sessionResult.data.session.user;
+
+      if (!user) {
+        throw new Error("Please log in before publishing a listing.");
+      }
+
+      const { data: profile, error: profileError } = await db
+        .from("profiles")
+        .select("id, role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        throw new Error("Could not verify your seller profile: " + profileError.message);
+      }
+
+      if (!profile) {
+        throw new Error(
+          "Your seller profile is missing. Please ask us to configure profile creation before publishing."
+        );
+      }
+
+      if (profile.role !== "seller" && profile.role !== "admin") {
+        throw new Error("This account does not have seller permission.");
+      }
+
+      const title = document.getElementById("title").value.trim();
+      const price = Number(document.getElementById("price").value);
+      const category = document.getElementById("category").value;
+      const condition = document.getElementById("condition").value;
+      const location = document.getElementById("location").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const allowOffers = document.getElementById("allowOffers").checked;
+      const files = Array.from(photoInput.files || []);
+
+      if (!title || !category || !condition || !location ||
+          !Number.isFinite(price) || price <= 0) {
+        throw new Error("Please complete all required fields with valid values.");
+      }
 
       if (files.length > 5) {
-        showMessage("Please select no more than 5 images.", "error");
-        return;
+        throw new Error("Please choose no more than 5 photos.");
       }
 
       for (const file of files) {
-        if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
-          showMessage("Each photo must be an image no larger than 5 MB.", "error");
-          return;
+        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+            file.size > 5 * 1024 * 1024) {
+          throw new Error("Each photo must be JPG, PNG, or WebP and no larger than 5 MB.");
         }
       }
 
-      submitButton.disabled = true;
-      submitButton.textContent = "Saving listing…";
+      const listingData = {
+        seller_id: user.id,
+        title: title,
+        description: description || null,
+        price: price,
+        currency: "USD",
+        condition: condition,
+        location: location,
+        allow_offers: allowOffers,
+        status: "Active",
+        category: category
+      };
 
-      try {
-        const listing = {
-          title: document.getElementById("title").value.trim(),
-          price: Number(document.getElementById("price").value),
-          category: document.getElementById("category").value,
-          condition: document.getElementById("condition").value,
-          location: document.getElementById("location").value.trim(),
-          description: document.getElementById("description").value.trim(),
-          status: "Active"
-        };
+      const insertResult = await db
+        .from("listings")
+        .insert(listingData)
+        .select("id")
+        .single();
 
-        if (!listing.title || !listing.category || !listing.condition ||
-            !listing.location || !listing.description ||
-            !Number.isFinite(listing.price) || listing.price <= 0) {
-          throw new Error("Please complete all required fields with valid information.");
-        }
+      if (insertResult.error) {
+        throw new Error("Listing could not be saved: " + insertResult.error.message);
+      }
 
-        /*
-          The database may require an authenticated seller or additional
-          required columns. If the insert fails, no listing is published.
-        */
-        const insertResult = await client
-          .from("listings")
-          .insert(listing)
-          .select("*")
-          .single();
+      savedListing = insertResult.data;
 
-        if (insertResult.error) {
-          console.error("Listing insert error:", insertResult.error);
+      const imageRows = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const extension = file.type === "image/png" ? "png" :
+          file.type === "image/webp" ? "webp" : "jpg";
+
+        const path = user.id + "/" + savedListing.id + "/" +
+          crypto.randomUUID() + "." + extension;
+
+        const uploadResult = await db.storage
+          .from("listing-images")
+          .upload(path, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type
+          });
+
+        if (uploadResult.error) {
+          photoUploadFailed = true;
           throw new Error(
-            "The listing could not be saved. Your database may require seller login or additional permissions. Details: " +
-            insertResult.error.message
+            "The listing was created, but its photo could not be uploaded: " +
+            uploadResult.error.message
           );
         }
 
-        const savedListing = insertResult.data;
-        const uploadedUrls = [];
+        const publicUrl = db.storage
+          .from("listing-images")
+          .getPublicUrl(path).data.publicUrl;
 
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const extension = (file.name.split(".").pop() || "jpg")
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, "") || "jpg";
-
-          const path = savedListing.id + "/" + crypto.randomUUID() + "." + extension;
-
-          const uploadResult = await client.storage
-            .from("listing-images")
-            .upload(path, file, {
-              cacheControl: "3600",
-              upsert: false,
-              contentType: file.type
-            });
-
-          if (uploadResult.error) {
-            console.error("Image upload error:", uploadResult.error);
-            throw new Error(
-              "The listing was saved, but a photo could not be uploaded. Storage permissions may need configuration. Details: " +
-              uploadResult.error.message
-            );
-          }
-
-          const publicResult = client.storage
-            .from("listing-images")
-            .getPublicUrl(path);
-
-          uploadedUrls.push({
-            listing_id: savedListing.id,
-            image_url: publicResult.data.publicUrl,
-            display_order: i
-          });
-        }
-
-        if (uploadedUrls.length) {
-          const imageInsert = await client
-            .from("listing_images")
-            .insert(uploadedUrls);
-
-          if (imageInsert.error) {
-            console.error("Image record insert error:", imageInsert.error);
-            throw new Error(
-              "The listing was saved, but its photo records could not be saved. Database permissions may need configuration. Details: " +
-              imageInsert.error.message
-            );
-          }
-        }
-
-        showMessage(
-          "Listing saved successfully! " +
-          (files.length
-            ? "Your product and photos have been saved."
-            : "You did not add any photos.") +
-          " Open the homepage to check your listing.",
-          "success"
-        );
-
-        form.reset();
-        preview.replaceChildren();
-
-        const homeLink = document.createElement("a");
-        homeLink.href = "./index.html";
-        homeLink.textContent = " Go to Quick Cart homepage";
-        homeLink.style.display = "inline-block";
-        homeLink.style.marginTop = "10px";
-        homeLink.style.color = "#ea580c";
-        homeLink.style.fontWeight = "bold";
-        message.appendChild(document.createElement("br"));
-        message.appendChild(homeLink);
-
-      } catch (error) {
-        console.error("Quick Cart publishing error:", error);
-        showMessage(error.message || "Something went wrong. Please try again.", "error");
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Publish Listing";
+        imageRows.push({
+          listing_id: savedListing.id,
+          image_url: publicUrl,
+          display_order: i
+        });
       }
-    });
-  </script>
+
+      if (imageRows.length) {
+        const imageResult = await db.from("listing_images").insert(imageRows);
+
+        if (imageResult.error) {
+          photoUploadFailed = true;
+          throw new Error(
+            "The listing was created, but its photo record could not be saved: " +
+            imageResult.error.message
+          );
+        }
+      }
+
+      listingForm.reset();
+      preview.replaceChildren();
+
+      showMessage("Your listing was published successfully!", "success");
+
+      const link = document.createElement("a");
+      link.href = "./listing.html?id=" + encodeURIComponent(savedListing.id);
+      link.textContent = " View your listing";
+      link.style.display = "inline-block";
+      link.style.marginTop = "10px";
+      link.style.color = "#ea580c";
+      link.style.fontWeight = "bold";
+      pageMessage.appendChild(document.createElement("br"));
+      pageMessage.appendChild(link);
+
+    } catch (error) {
+      console.error("Publishing error:", error);
+
+      let text = error.message || "Something went wrong.";
+
+      if (savedListing && photoUploadFailed) {
+        text += " Your listing exists, but photo saving needs to be fixed. Do not submit it again yet.";
+      }
+
+      showMessage(text, "error");
+    } finally {
+      publishButton.disabled = false;
+      publishButton.textContent = "Publish Listing";
+    }
+  });
+
+  db.auth.onAuthStateChange(function() {
+    updateSessionView();
+  });
+
+  setAuthMode("login");
+  updateSessionView();
+</script>
 </body>
 </html>
