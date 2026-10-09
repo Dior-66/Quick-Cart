@@ -1,1 +1,479 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sell an Item | Quick Cart</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --orange: #f97316;
+      --dark-orange: #ea580c;
+      --border: #e5e7eb;
+      --muted: #6b7280;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f8fafc;
+      color: #222;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .brand {
+      color: var(--orange);
+      font-size: 25px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    header a.home {
+      color: #333;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 35px auto;
+      padding: 0 18px;
+    }
+
+    .intro { margin-bottom: 22px; }
+
+    h1 { font-size: 32px; margin-bottom: 8px; }
+
+    .intro p { color: var(--muted); margin-top: 0; }
+
+    .form-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.04);
+    }
+
+    .field { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .required { color: var(--orange); }
+
+    input, select, textarea {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      background: white;
+      font: inherit;
+      outline-color: var(--orange);
+    }
+
+    textarea { min-height: 120px; resize: vertical; }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .upload-box {
+      border: 2px dashed #fdba74;
+      background: #fff7ed;
+      border-radius: 12px;
+      padding: 25px 15px;
+      text-align: center;
+    }
+
+    .upload-box p { color: var(--muted); font-size: 13px; }
+
+    input[type="file"] {
+      border: 0;
+      padding: 8px 0;
+    }
+
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .preview img {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 9px;
+      padding: 15px;
+      color: white;
+      background: var(--orange);
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover { background: var(--dark-orange); }
+    .submit-btn:disabled { opacity: .6; cursor: wait; }
+
+    .message {
+      margin-top: 16px;
+      padding: 13px;
+      border-radius: 9px;
+      display: none;
+      overflow-wrap: anywhere;
+    }
+
+    .message.success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .message.error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 15px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .two-columns { grid-template-columns: 1fr; gap: 0; }
+      .form-card { padding: 19px; }
+      h1 { font-size: 27px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a class="brand" href="./index.html">🛒 Quick Cart</a>
+    <a class="home" href="./index.html">← Back to Home</a>
+  </header>
+
+  <main>
+    <div class="intro">
+      <h1>Sell an Item</h1>
+      <p>Share your product with buyers on Quick Cart.</p>
+    </div>
+
+    <div class="form-card">
+      <form id="listingForm">
+        <div class="field">
+          <label for="title">Product title <span class="required">*</span></label>
+          <input id="title" name="title" maxlength="120" required
+                 placeholder="e.g. Gradient Infuser Bottle">
+        </div>
+
+        <div class="two-columns">
+          <div class="field">
+            <label for="price">Price (USD) <span class="required">*</span></label>
+            <input id="price" name="price" type="number"
+                   min="0.01" max="999999999" step="0.01"
+                   required placeholder="15.00">
+          </div>
+
+          <div class="field">
+            <label for="category">Category <span class="required">*</span></label>
+            <select id="category" name="category" required>
+              <option value="">Choose category</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Phones">Phones</option>
+              <option value="Computers">Computers</option>
+              <option value="Cars & Vehicles">Cars & Vehicles</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Gaming">Gaming</option>
+              <option value="Home & Garden">Home & Garden</option>
+              <option value="Baby & Kids">Baby & Kids</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="two-columns">
+          <div class="field">
+            <label for="condition">Condition <span class="required">*</span></label>
+            <select id="condition" name="condition" required>
+              <option value="">Choose condition</option>
+              <option value="New">New</option>
+              <option value="Like New">Like New</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Used">Used</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="location">Location <span class="required">*</span></label>
+            <input id="location" name="location" maxlength="100"
+                   required placeholder="e.g. Abu Dhabi, UAE">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Product description <span class="required">*</span></label>
+          <textarea id="description" name="description" maxlength="5000"
+                    required placeholder="Describe your product, its features and condition..."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="images">Product photos</label>
+          <div class="upload-box">
+            <div style="font-size:35px">📸</div>
+            <strong>Add photos of your product</strong>
+            <p>Select up to 5 images, maximum 5 MB each.</p>
+            <input id="images" name="images" type="file"
+                   accept="image/jpeg,image/png,image/webp,image/gif"
+                   multiple>
+            <div class="preview" id="imagePreview"></div>
+          </div>
+        </div>
+
+        <button class="submit-btn" id="submitButton" type="submit">
+          Publish Listing
+        </button>
+
+        <div class="message" id="formMessage" role="status" aria-live="polite"></div>
+
+        <p class="note">
+          Your listing will be saved to Quick Cart. Publishing requires the
+          appropriate Supabase database and Storage permissions. Do not enter
+          passwords or private account information here.
+        </p>
+      </form>
+    </div>
+  </main>
+
+  <footer>Quick Cart — Buy Smart. Sell Easy.</footer>
+
+  <script>
+    const SUPABASE_URL = "https://dgnkmkyueqgbiahztuux.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
+
+    const client = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    const form = document.getElementById("listingForm");
+    const imageInput = document.getElementById("images");
+    const preview = document.getElementById("imagePreview");
+    const message = document.getElementById("formMessage");
+    const submitButton = document.getElementById("submitButton");
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "message " + type;
+    }
+
+    imageInput.addEventListener("change", function() {
+      preview.replaceChildren();
+
+      const files = Array.from(imageInput.files || []);
+
+      if (files.length > 5) {
+        imageInput.value = "";
+        showMessage("Please select no more than 5 images.", "error");
+        return;
+      }
+
+      for (const file of files) {
+        if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+          imageInput.value = "";
+          preview.replaceChildren();
+          showMessage("Each photo must be an image no larger than 5 MB.", "error");
+          return;
+        }
+      }
+
+      files.forEach(function(file) {
+        const img = document.createElement("img");
+        img.alt = "Selected product photo";
+        img.src = URL.createObjectURL(file);
+        preview.appendChild(img);
+      });
+
+      message.className = "message";
+    });
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+      message.className = "message";
+
+      const files = Array.from(imageInput.files || []);
+
+      if (files.length > 5) {
+        showMessage("Please select no more than 5 images.", "error");
+        return;
+      }
+
+      for (const file of files) {
+        if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+          showMessage("Each photo must be an image no larger than 5 MB.", "error");
+          return;
+        }
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Saving listing…";
+
+      try {
+        const listing = {
+          title: document.getElementById("title").value.trim(),
+          price: Number(document.getElementById("price").value),
+          category: document.getElementById("category").value,
+          condition: document.getElementById("condition").value,
+          location: document.getElementById("location").value.trim(),
+          description: document.getElementById("description").value.trim(),
+          status: "Active"
+        };
+
+        if (!listing.title || !listing.category || !listing.condition ||
+            !listing.location || !listing.description ||
+            !Number.isFinite(listing.price) || listing.price <= 0) {
+          throw new Error("Please complete all required fields with valid information.");
+        }
+
+        /*
+          The database may require an authenticated seller or additional
+          required columns. If the insert fails, no listing is published.
+        */
+        const insertResult = await client
+          .from("listings")
+          .insert(listing)
+          .select("*")
+          .single();
+
+        if (insertResult.error) {
+          console.error("Listing insert error:", insertResult.error);
+          throw new Error(
+            "The listing could not be saved. Your database may require seller login or additional permissions. Details: " +
+            insertResult.error.message
+          );
+        }
+
+        const savedListing = insertResult.data;
+        const uploadedUrls = [];
+
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const extension = (file.name.split(".").pop() || "jpg")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "") || "jpg";
+
+          const path = savedListing.id + "/" + crypto.randomUUID() + "." + extension;
+
+          const uploadResult = await client.storage
+            .from("listing-images")
+            .upload(path, file, {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: file.type
+            });
+
+          if (uploadResult.error) {
+            console.error("Image upload error:", uploadResult.error);
+            throw new Error(
+              "The listing was saved, but a photo could not be uploaded. Storage permissions may need configuration. Details: " +
+              uploadResult.error.message
+            );
+          }
+
+          const publicResult = client.storage
+            .from("listing-images")
+            .getPublicUrl(path);
+
+          uploadedUrls.push({
+            listing_id: savedListing.id,
+            image_url: publicResult.data.publicUrl,
+            display_order: i
+          });
+        }
+
+        if (uploadedUrls.length) {
+          const imageInsert = await client
+            .from("listing_images")
+            .insert(uploadedUrls);
+
+          if (imageInsert.error) {
+            console.error("Image record insert error:", imageInsert.error);
+            throw new Error(
+              "The listing was saved, but its photo records could not be saved. Database permissions may need configuration. Details: " +
+              imageInsert.error.message
+            );
+          }
+        }
+
+        showMessage(
+          "Listing saved successfully! " +
+          (files.length
+            ? "Your product and photos have been saved."
+            : "You did not add any photos.") +
+          " Open the homepage to check your listing.",
+          "success"
+        );
+
+        form.reset();
+        preview.replaceChildren();
+
+        const homeLink = document.createElement("a");
+        homeLink.href = "./index.html";
+        homeLink.textContent = " Go to Quick Cart homepage";
+        homeLink.style.display = "inline-block";
+        homeLink.style.marginTop = "10px";
+        homeLink.style.color = "#ea580c";
+        homeLink.style.fontWeight = "bold";
+        message.appendChild(document.createElement("br"));
+        message.appendChild(homeLink);
+
+      } catch (error) {
+        console.error("Quick Cart publishing error:", error);
+        showMessage(error.message || "Something went wrong. Please try again.", "error");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Publish Listing";
+      }
+    });
+  </script>
+</body>
+</html>
