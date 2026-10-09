@@ -772,6 +772,23 @@
         }
 
         allListings = data || [];
+        const imageResult = await supabaseClient
+  .from("listing_images")
+  .select("listing_id, image_url")
+  .in("listing_id", allListings.map(item => item.id));
+
+if (!imageResult.error && imageResult.data) {
+  allListings = allListings.map(item => {
+    const productImage = imageResult.data.find(
+      img => img.listing_id === item.id
+    );
+
+    return {
+      ...item,
+      image_url: productImage ? productImage.image_url : null
+    };
+  });
+}
 
         console.log(
           "Quick Cart listings from Supabase:",
