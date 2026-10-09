@@ -663,7 +663,18 @@
 
         const image = document.createElement("div");
         image.className = "product-image";
-        image.textContent = "🛒";
+        const productImage = document.createElement("img");
+productImage.src = listing.image_url || "";
+productImage.alt = listing.title || "Product image";
+productImage.style.width = "100%";
+productImage.style.height = "100%";
+productImage.style.objectFit = "contain";
+
+if (listing.image_url) {
+  image.appendChild(productImage);
+} else {
+  image.textContent = "🛒";
+}
 
         const info = document.createElement("div");
         info.className = "product-info";
