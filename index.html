@@ -1,900 +1,688 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="theme-color" content="#f97316">
+  <meta name="description" content="Quick Cart — Buy Smart. Sell Easy. Discover great products and local deals.">
   <title>Quick Cart — Buy Smart. Sell Easy.</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    html {
-      scroll-behavior: smooth;
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #f97316;
+      --orange-dark: #ea580c;
+      --light-orange: #fff7ed;
+      --text: #222;
+      --muted: #6b7280;
+      --border: #e5e7eb;
     }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: #f7f7f7;
-      color: #222;
+      color: var(--text);
+      background: #f8fafc;
+      line-height: 1.5;
     }
 
-    a {
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
 
-    button,
-    input {
-      font: inherit;
-    }
-
-    /* HEADER */
-    header {
-      background: #fff;
-      border-bottom: 1px solid #eee;
+    .topbar {
+      background: white;
+      border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
-      z-index: 1000;
+      z-index: 10;
     }
 
-    .navbar {
+    .nav {
       max-width: 1200px;
       margin: auto;
-      min-height: 72px;
-      padding: 12px 20px;
+      min-height: 76px;
+      padding: 14px 22px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 20px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #f97316;
-      font-size: 25px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .cart-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: #f97316;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 21px;
-    }
-
-    .search {
-      flex: 1;
-      max-width: 520px;
-      margin-left: auto;
-      display: flex;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      overflow: hidden;
-      background: white;
-    }
-
-    .search input {
-      width: 100%;
-      border: none;
-      outline: none;
-      padding: 13px 16px;
-      font-size: 15px;
-    }
-
-    .search button {
-      border: none;
-      background: #f97316;
-      color: white;
-      padding: 0 20px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .nav-links a {
-      color: #333;
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .sell-btn {
-      background: #f97316;
-      color: white !important;
-      padding: 11px 17px;
-      border-radius: 9px;
-    }
-
-    /* HERO */
-    .hero {
-      background: linear-gradient(135deg, #fff7ed, #ffffff);
-      padding: 75px 20px;
-    }
-
-    .hero-content {
-      max-width: 1200px;
-      margin: auto;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: clamp(40px, 6vw, 68px);
-      line-height: 1.05;
-      margin-bottom: 20px;
-    }
-
-    .hero h1 span {
-      color: #f97316;
-    }
-
-    .hero p {
-      color: #666;
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-
-    .hero-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
       flex-wrap: wrap;
     }
 
-    .primary-btn,
-    .secondary-btn {
-      display: inline-block;
-      padding: 14px 25px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 25px;
+      font-weight: 800;
+      color: var(--orange);
     }
 
-    .primary-btn {
-      background: #f97316;
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      background: var(--orange);
       color: white;
+      border-radius: 12px;
+      font-size: 25px;
     }
 
-    .secondary-btn {
+    .tagline {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      padding: 11px 18px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
       background: white;
-      color: #333;
-      border: 1px solid #ddd;
+      color: var(--text);
+      font-weight: 700;
     }
 
-    /* GENERAL */
-    .section {
+    .btn-primary {
+      background: var(--orange);
+      color: white;
+      border-color: var(--orange);
+    }
+
+    .btn-primary:hover { background: var(--orange-dark); }
+
+    .hero {
+      background: linear-gradient(125deg, #fff7ed, #ffedd5 60%, #fed7aa);
+      padding: 65px 22px;
+    }
+
+    .hero-inner {
       max-width: 1200px;
       margin: auto;
-      padding: 50px 20px;
-    }
-
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-    }
-
-    .section-title h2 {
-      font-size: 28px;
-    }
-
-    .section-title a {
-      color: #f97316;
-      font-weight: bold;
-    }
-
-    /* CATEGORIES */
-    .categories {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      grid-template-columns: 1.3fr 0.7fr;
+      align-items: center;
+      gap: 35px;
+    }
+
+    .eyebrow {
+      color: var(--orange-dark);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-size: 12px;
+      margin-bottom: 13px;
+    }
+
+    h1 {
+      font-size: clamp(35px, 5vw, 58px);
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      max-width: 650px;
+    }
+
+    .hero h1 span { color: var(--orange); }
+
+    .hero p {
+      color: #57534e;
+      font-size: 17px;
+      max-width: 570px;
+      margin: 18px 0 25px;
+    }
+
+    .hero-art {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      font-size: 115px;
+      background: rgba(255,255,255,0.55);
+      border-radius: 30px;
+    }
+
+    .search-wrap {
+      max-width: 900px;
+      margin: -27px auto 0;
+      padding: 0 22px;
+      position: relative;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      background: white;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+    }
+
+    .search-box input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      padding: 8px 10px;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 45px 22px 65px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
       gap: 15px;
+      margin-bottom: 22px;
+    }
+
+    h2 { font-size: 28px; }
+    .section-heading p { color: var(--muted); font-size: 14px; }
+
+    .categories {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 2px 0 22px;
     }
 
     .category {
+      flex-shrink: 0;
+      border: 1px solid var(--border);
       background: white;
-      border: 1px solid #eee;
-      border-radius: 14px;
-      padding: 22px 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
+      padding: 10px 15px;
+      border-radius: 25px;
+      font-weight: 700;
+      color: #444;
     }
 
-    .category:hover {
-      transform: translateY(-3px);
-      border-color: #f97316;
+    .category.active, .category:hover {
+      background: var(--light-orange);
+      border-color: var(--orange);
+      color: var(--orange-dark);
     }
 
-    .category-icon {
-      font-size: 30px;
-      margin-bottom: 10px;
-    }
-
-    .category strong {
-      font-size: 14px;
-    }
-
-    /* PRODUCTS */
     .products {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
     }
 
     .product {
       background: white;
+      border: 1px solid var(--border);
       border-radius: 15px;
       overflow: hidden;
-      border: 1px solid #eee;
+      transition: transform .2s, box-shadow .2s;
       cursor: pointer;
-      transition: 0.2s;
     }
 
     .product:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      box-shadow: 0 12px 28px rgba(0,0,0,.08);
     }
 
     .product-image {
-      height: 190px;
-      background: #f3f4f6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 55px;
+      height: 230px;
+      background: #fff7ed;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--orange);
+      font-size: 65px;
     }
 
-    .product-info {
-      padding: 16px;
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 10px;
+      display: block;
     }
+
+    .product-info { padding: 17px; }
 
     .product-info h3 {
       font-size: 16px;
-      margin-bottom: 8px;
-      line-height: 1.3;
+      line-height: 1.4;
+      margin-bottom: 7px;
+      overflow-wrap: anywhere;
     }
 
     .price {
-      color: #f97316;
-      font-size: 20px;
+      font-size: 21px;
+      color: var(--orange-dark);
       font-weight: 800;
-      margin-bottom: 6px;
+      margin: 9px 0;
     }
 
-    .location {
-      color: #777;
+    .product-meta {
       font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .condition {
-      display: inline-block;
-      margin-top: 9px;
-      padding: 5px 8px;
-      background: #fff7ed;
-      color: #c2410c;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    /* STATUS */
     .status {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 40px 20px;
-      color: #666;
+      padding: 50px 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
       background: white;
-      border-radius: 15px;
-      border: 1px solid #eee;
     }
 
-    .error {
-      color: #b91c1c;
-    }
+    .status h3 { margin-bottom: 8px; }
+    .status p { color: var(--muted); }
+    .error-text { color: #b91c1c !important; }
 
-    /* SELL SECTION */
-    .sell-section {
-      background: #111827;
+    .sell-banner {
+      margin-top: 55px;
+      background: #1f2937;
       color: white;
-      border-radius: 20px;
-      padding: 45px;
-      text-align: center;
-    }
-
-    .sell-section h2 {
-      font-size: 32px;
-      margin-bottom: 12px;
-    }
-
-    .sell-section p {
-      color: #d1d5db;
-      margin-bottom: 25px;
-    }
-
-    /* FOOTER */
-    footer {
-      background: #111;
-      color: white;
-      margin-top: 30px;
-    }
-
-    .footer-content {
-      max-width: 1200px;
-      margin: auto;
-      padding: 40px 20px;
+      border-radius: 18px;
+      padding: 35px;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      gap: 30px;
-      flex-wrap: wrap;
-    }
-
-    .footer-content p {
-      color: #aaa;
-      margin-top: 8px;
-    }
-
-    .footer-links {
-      display: flex;
       gap: 20px;
-      flex-wrap: wrap;
     }
 
-    .footer-links a {
-      color: #ddd;
-    }
+    .sell-banner p { color: #d1d5db; margin-top: 5px; }
 
-    .copyright {
+    footer {
+      background: white;
+      border-top: 1px solid var(--border);
+      padding: 28px 22px;
+      color: var(--muted);
       text-align: center;
-      border-top: 1px solid #333;
-      padding: 18px;
-      color: #999;
       font-size: 13px;
     }
 
-    /* MOBILE */
-    @media (max-width: 800px) {
-      .navbar {
-        flex-wrap: wrap;
-        padding: 15px;
-      }
-
-      .search {
-        order: 3;
-        flex-basis: 100%;
-        max-width: none;
-      }
-
-      .nav-links {
-        margin-left: auto;
-      }
-
-      .nav-links a:not(.sell-btn) {
-        display: none;
-      }
-
-      .hero {
-        padding: 55px 20px;
-      }
-
-      .hero h1 {
-        font-size: 42px;
-      }
-
-      .section {
-        padding: 40px 15px;
-      }
-
-      .sell-section {
-        padding: 35px 20px;
-      }
+    @media (max-width: 900px) {
+      .products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-art { display: none; }
     }
 
-    @media (max-width: 480px) {
-      .logo {
-        font-size: 21px;
-      }
-
-      .cart-icon {
-        width: 36px;
-        height: 36px;
-      }
-
-      .sell-btn {
-        padding: 9px 12px;
-      }
-
-      .hero h1 {
-        font-size: 36px;
-      }
-
-      .products {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 620px) {
+      .nav { padding: 12px 15px; }
+      .brand { font-size: 21px; }
+      .nav-actions { width: 100%; }
+      .nav-actions .btn { flex: 1; padding: 10px; }
+      .hero { padding: 45px 18px; }
+      .hero p { font-size: 15px; }
+      .search-box { padding: 8px; }
+      main { padding: 35px 15px 45px; }
+      .products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .product-image { height: 165px; }
+      .product-info { padding: 12px; }
+      .product-info h3 { font-size: 14px; }
+      .price { font-size: 18px; }
+      .sell-banner { padding: 25px 20px; flex-direction: column; align-items: flex-start; }
+      h2 { font-size: 24px; }
     }
   </style>
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
-
-  <!-- HEADER -->
-  <header>
-    <nav class="navbar">
-
-      <a href="index.html" class="logo">
-        <div class="cart-icon">🛒</div>
-        Quick Cart
+  <header class="topbar">
+    <nav class="nav">
+      <a class="brand" href="./index.html" aria-label="Quick Cart home">
+        <span class="brand-icon">🛒</span>
+        <span>Quick Cart<div class="tagline">Buy Smart. Sell Easy.</div></span>
       </a>
 
-      <div class="search">
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Search products, cars, phones and more..."
-        >
-        <button id="searchButton">Search</button>
+      <div class="nav-actions">
+        <a class="btn" href="#products">Browse Products</a>
+        <button class="btn btn-primary" id="sellButton" type="button">＋ Sell an Item</button>
       </div>
-
-      <div class="nav-links">
-        <a href="#featured">Listings</a>
-        <a href="#" id="loginLink">Login</a>
-        <a href="#" class="sell-btn" id="sellButton">Sell an Item</a>
-      </div>
-
     </nav>
   </header>
 
-  <!-- HERO -->
   <section class="hero">
-    <div class="hero-content">
-
-      <h1>
-        Buy it. Sell it.<br>
-        <span>Find it on Quick Cart.</span>
-      </h1>
-
-      <p>Buy Smart. Sell Easy.</p>
-
-      <div class="hero-buttons">
-        <a href="#featured" class="primary-btn">Browse Products</a>
-        <a href="#" class="secondary-btn" id="startSellingButton">
-          Start Selling
-        </a>
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">Your marketplace, made simple</div>
+        <h1>Buy it. Sell it. <span>Find it on Quick Cart.</span></h1>
+        <p>Discover great finds, explore local listings, and find the things you need—all in one place.</p>
+        <a class="btn btn-primary" href="#products">Explore Products →</a>
       </div>
-
+      <div class="hero-art" aria-hidden="true">🛍️</div>
     </div>
   </section>
 
-  <!-- CATEGORIES -->
-  <section class="section">
+  <div class="search-wrap">
+    <div class="search-box">
+      <input id="searchInput" type="search" placeholder="Search products, brands, or keywords..." aria-label="Search products">
+      <button class="btn btn-primary" id="searchButton" type="button">Search</button>
+    </div>
+  </div>
 
-    <div class="section-title">
-      <h2>Browse Categories</h2>
+  <main id="products">
+    <div class="section-heading">
+      <div>
+        <h2>Discover Products</h2>
+        <p>Find something you love today.</p>
+      </div>
     </div>
 
-    <div class="categories">
-
-      <div class="category" data-category="Phones">
-        <div class="category-icon">📱</div>
-        <strong>Phones</strong>
-      </div>
-
-      <div class="category" data-category="Computers">
-        <div class="category-icon">💻</div>
-        <strong>Computers</strong>
-      </div>
-
-      <div class="category" data-category="Cars & Vehicles">
-        <div class="category-icon">🚗</div>
-        <strong>Cars & Vehicles</strong>
-      </div>
-
-      <div class="category" data-category="Fashion">
-        <div class="category-icon">👗</div>
-        <strong>Fashion</strong>
-      </div>
-
-      <div class="category" data-category="Furniture">
-        <div class="category-icon">🛋️</div>
-        <strong>Furniture</strong>
-      </div>
-
-      <div class="category" data-category="Gaming">
-        <div class="category-icon">🎮</div>
-        <strong>Gaming</strong>
-      </div>
-
-      <div class="category" data-category="Home & Garden">
-        <div class="category-icon">🏠</div>
-        <strong>Home & Garden</strong>
-      </div>
-
-      <div class="category" data-category="Baby & Kids">
-        <div class="category-icon">👶</div>
-        <strong>Baby & Kids</strong>
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- FEATURED LISTINGS -->
-  <section class="section" id="featured">
-
-    <div class="section-title">
-      <h2>Featured Listings</h2>
-      <a href="#featured">View All</a>
+    <div class="categories" id="categories">
+      <button class="category active" data-category="all">All Products</button>
+      <button class="category" data-category="electronics">Electronics</button>
+      <button class="category" data-category="phones">Phones</button>
+      <button class="category" data-category="computers">Computers</button>
+      <button class="category" data-category="cars">Cars &amp; Vehicles</button>
+      <button class="category" data-category="fashion">Fashion</button>
+      <button class="category" data-category="furniture">Furniture</button>
+      <button class="category" data-category="gaming">Gaming</button>
+      <button class="category" data-category="home">Home &amp; Garden</button>
+      <button class="category" data-category="baby">Baby &amp; Kids</button>
     </div>
 
     <div class="products" id="featured-products">
-
       <div class="status">
-        Loading listings...
+        <h3>Loading products…</h3>
+        <p>Please wait while Quick Cart loads the latest listings.</p>
       </div>
-
     </div>
 
-  </section>
-
-  <!-- SELL -->
-  <section class="section">
-
-    <div class="sell-section">
-
-      <h2>Have something to sell?</h2>
-
-      <p>
-        Turn your unused items into cash with Quick Cart.
-      </p>
-
-      <a href="#" class="primary-btn" id="sellBottomButton">
-        Sell an Item
-      </a>
-
-    </div>
-
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-
-    <div class="footer-content">
-
+    <section class="sell-banner">
       <div>
-        <div class="logo">
-          <div class="cart-icon">🛒</div>
-          Quick Cart
-        </div>
-
-        <p>Buy Smart. Sell Easy.</p>
+        <h2>Have something to sell?</h2>
+        <p>Quick Cart makes discovering and selling products simple.</p>
       </div>
+      <button class="btn btn-primary" id="sellBannerButton" type="button">Start Selling →</button>
+    </section>
+  </main>
 
-      <div class="footer-links">
-        <a href="#">About</a>
-        <a href="#">Safety</a>
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-      </div>
-
-    </div>
-
-    <div class="copyright">
-      © 2026 Quick Cart. All rights reserved.
-    </div>
-
+  <footer>
+    <p><strong>Quick Cart</strong> — Buy Smart. Sell Easy.</p>
+    <p style="margin-top:6px">A marketplace for discovering products and local deals.</p>
   </footer>
 
-  <!-- QUICK CART JAVASCRIPT -->
   <script>
-    const SUPABASE_URL =
-      "https://dgnkmkyueqgbiahztuux.supabase.co";
+    const SUPABASE_URL = "https://dgnkmkyueqgbiahztuux.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
 
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
-
-    const { createClient } = supabase;
-
-    const supabaseClient = createClient(
+    const supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
+      SUPABASE_KEY
     );
 
-    console.log("Quick Cart connected to Supabase");
+    const container = document.getElementById("featured-products");
+    const searchInput = document.getElementById("searchInput");
 
     let allListings = [];
+    let activeCategory = "all";
 
-    function openListing(id) {
-      window.location.href =
-        "listing.html?id=" + encodeURIComponent(id);
+    function showStatus(title, message, isError = false) {
+      container.replaceChildren();
+
+      const box = document.createElement("div");
+      box.className = "status";
+
+      const heading = document.createElement("h3");
+      heading.textContent = title;
+
+      const paragraph = document.createElement("p");
+      paragraph.textContent = message;
+
+      if (isError) paragraph.className = "error-text";
+
+      box.append(heading, paragraph);
+      container.appendChild(box);
     }
 
-    window.openListing = openListing;
+    function getListingCategory(listing) {
+      return String(listing.category || "").toLowerCase();
+    }
 
-    function formatPrice(listing) {
-      const currency = listing.currency || "USD";
-      const price = listing.price ?? "";
+    function categoryMatches(listing, category) {
+      if (category === "all") return true;
 
-      return `${currency} ${price}`;
+      const value = getListingCategory(listing);
+
+      const groups = {
+        electronics: ["electronics", "electronic"],
+        phones: ["phone", "mobile", "smartphone"],
+        computers: ["computer", "laptop", "pc"],
+        cars: ["car", "vehicle", "automotive"],
+        fashion: ["fashion", "clothing", "clothes", "shoes"],
+        furniture: ["furniture"],
+        gaming: ["gaming", "games", "console"],
+        home: ["home", "garden", "kitchen", "household"],
+        baby: ["baby", "kids", "children", "toys"]
+      };
+
+      return (groups[category] || [category]).some(item =>
+        value.includes(item)
+      );
     }
 
     function renderListings(listings) {
-      const container =
-        document.getElementById("featured-products");
+      container.replaceChildren();
 
-      if (!listings || listings.length === 0) {
-        container.innerHTML = `
-          <div class="status">
-            <h3>No listings found</h3>
-            <p>Try another search or category.</p>
-          </div>
-        `;
+      if (!listings.length) {
+        showStatus(
+          "No products found",
+          "Try another search or choose a different category."
+        );
         return;
       }
 
-      container.innerHTML = "";
-
       listings.forEach(function(listing) {
-
-        const card = document.createElement("div");
+        const card = document.createElement("article");
         card.className = "product";
+        card.tabIndex = 0;
+        card.setAttribute("role", "link");
+        card.setAttribute("aria-label", "View " + (listing.title || "product"));
 
-        card.addEventListener("click", function() {
-          openListing(listing.id);
+        function openProduct() {
+          window.location.href =
+            "./listing.html?id=" + encodeURIComponent(listing.id);
+        }
+
+        card.addEventListener("click", openProduct);
+        card.addEventListener("keydown", function(event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openProduct();
+          }
         });
 
-        const image = document.createElement("div");
-        image.className = "product-image";
-        const productImage = document.createElement("img");
-productImage.src = listing.image_url || "";
-productImage.alt = listing.title || "Product image";
-productImage.style.width = "100%";
-productImage.style.height = "100%";
-productImage.style.objectFit = "contain";
+        const imageBox = document.createElement("div");
+        imageBox.className = "product-image";
 
-if (listing.image_url) {
-  image.appendChild(productImage);
-} else {
-  image.textContent = "🛒";
-}
+        if (listing.image_url) {
+          const img = document.createElement("img");
+          img.src = listing.image_url;
+          img.alt = listing.title || "Product image";
+          img.loading = "lazy";
+
+          img.addEventListener("error", function() {
+            img.remove();
+            imageBox.textContent = "🛒";
+          });
+
+          imageBox.appendChild(img);
+        } else {
+          imageBox.textContent = "🛒";
+        }
 
         const info = document.createElement("div");
         info.className = "product-info";
 
         const title = document.createElement("h3");
-        title.textContent =
-          listing.title || "Untitled Listing";
+        title.textContent = listing.title || "Untitled product";
 
         const price = document.createElement("div");
         price.className = "price";
-        price.textContent = formatPrice(listing);
 
-        const location = document.createElement("div");
-        location.className = "location";
-        location.textContent =
-          "📍 " + (listing.location || "Location not specified");
+        const amount = Number(listing.price);
+        const currency = listing.currency || "USD";
 
-        info.appendChild(title);
-        info.appendChild(price);
-        info.appendChild(location);
+        price.textContent = Number.isFinite(amount)
+          ? new Intl.NumberFormat("en", {
+              style: "currency",
+              currency: currency,
+              maximumFractionDigits: 2
+            }).format(amount)
+          : (listing.price || "Price not listed");
 
-        if (listing.condition) {
-          const condition = document.createElement("span");
-          condition.className = "condition";
-          condition.textContent = listing.condition;
-          info.appendChild(condition);
-        }
+        const meta = document.createElement("div");
+        meta.className = "product-meta";
 
-        card.appendChild(image);
-        card.appendChild(info);
+        const location = document.createElement("span");
+        location.textContent = "📍 " + (listing.location || "Location not specified");
 
+        const condition = document.createElement("span");
+        condition.textContent = listing.condition || "Listed item";
+
+        meta.append(location, condition);
+        info.append(title, price, meta);
+        card.append(imageBox, info);
         container.appendChild(card);
       });
     }
 
-    function filterListings() {
-      const input =
-        document.getElementById("searchInput");
-
-      const searchText =
-        input.value.trim().toLowerCase();
-
-      if (!searchText) {
-        renderListings(allListings);
-        return;
-      }
+    function applyFilters() {
+      const searchTerm = searchInput.value.trim().toLowerCase();
 
       const filtered = allListings.filter(function(listing) {
+        const searchableText = [
+          listing.title,
+          listing.description,
+          listing.category,
+          listing.location,
+          listing.condition
+        ].filter(Boolean).join(" ").toLowerCase();
 
-        const title =
-          String(listing.title || "").toLowerCase();
-
-        const description =
-          String(listing.description || "").toLowerCase();
-
-        const category =
-          String(listing.category || "").toLowerCase();
-
-        const location =
-          String(listing.location || "").toLowerCase();
-
-        return (
-          title.includes(searchText) ||
-          description.includes(searchText) ||
-          category.includes(searchText) ||
-          location.includes(searchText)
-        );
+        return searchableText.includes(searchTerm) &&
+          categoryMatches(listing, activeCategory);
       });
 
       renderListings(filtered);
     }
 
     async function loadListings() {
-
-      const container =
-        document.getElementById("featured-products");
+      showStatus("Loading products…", "Connecting to Quick Cart.");
 
       try {
-
         const result = await supabaseClient
           .from("listings")
           .select("*")
           .eq("status", "Active")
-          .order("created_at", {
-            ascending: false
-          })
+          .order("created_at", { ascending: false })
           .limit(50);
 
-        const data = result.data;
-        const error = result.error;
-
-        if (error) {
-          console.error(
-            "Supabase listings error:",
-            error
+        if (result.error) {
+          console.error("Quick Cart listings error:", result.error);
+          showStatus(
+            "Unable to load products",
+            "Please refresh the page. If the problem continues, the database permissions may need checking.",
+            true
           );
-
-          container.innerHTML = `
-            <div class="status error">
-              <h3>Unable to load listings</h3>
-              <p>Please refresh the page and try again.</p>
-            </div>
-          `;
-
           return;
         }
 
-        allListings = data || [];
+        const listings = result.data || [];
+
+        if (listings.length === 0) {
+          allListings = [];
+          showStatus(
+            "No active products yet",
+            "Products will appear here when active listings are available."
+          );
+          return;
+        }
+
+        const listingIds = listings.map(item => item.id);
         const imageResult = await supabaseClient
-  .from("listing_images")
-  .select("listing_id, image_url")
-  .in("listing_id", allListings.map(item => item.id));
+          .from("listing_images")
+          .select("listing_id, image_url, display_order")
+          .in("listing_id", listingIds)
+          .order("display_order", { ascending: true });
 
-if (!imageResult.error && imageResult.data) {
-  allListings = allListings.map(item => {
-    const productImage = imageResult.data.find(
-      img => img.listing_id === item.id
-    );
+        if (imageResult.error) {
+          console.error("Quick Cart image query error:", imageResult.error);
+        }
 
-    return {
-      ...item,
-      image_url: productImage ? productImage.image_url : null
-    };
-  });
-}
+        const images = imageResult.data || [];
+        const firstImageByListing = new Map();
 
-        console.log(
-          "Quick Cart listings from Supabase:",
-          allListings
-        );
+        images.forEach(function(image) {
+          if (
+            image.listing_id &&
+            image.image_url &&
+            !firstImageByListing.has(image.listing_id)
+          ) {
+            firstImageByListing.set(image.listing_id, image.image_url);
+          }
+        });
 
-        renderListings(allListings);
+        allListings = listings.map(function(listing) {
+          return {
+            ...listing,
+            image_url: firstImageByListing.get(listing.id) || null
+          };
+        });
 
+        console.log("Quick Cart loaded listings:", allListings);
+        applyFilters();
       } catch (error) {
-
-        console.error(
-          "Unexpected Quick Cart error:",
-          error
+        console.error("Quick Cart unexpected error:", error);
+        showStatus(
+          "Something went wrong",
+          "Please refresh the page and try again.",
+          true
         );
-
-        container.innerHTML = `
-          <div class="status error">
-            <h3>Something went wrong</h3>
-            <p>Please refresh the page and try again.</p>
-          </div>
-        `;
       }
     }
 
-    document
-      .getElementById("searchButton")
-      .addEventListener("click", filterListings);
+    document.getElementById("searchButton").addEventListener("click", applyFilters);
 
-    document
-      .getElementById("searchInput")
-      .addEventListener("keydown", function(event) {
+    searchInput.addEventListener("input", applyFilters);
 
-        if (event.key === "Enter") {
-          filterListings();
-        }
+    document.getElementById("categories").addEventListener("click", function(event) {
+      const button = event.target.closest("button[data-category]");
+      if (!button) return;
 
+      activeCategory = button.dataset.category;
+
+      document.querySelectorAll(".category").forEach(function(item) {
+        item.classList.toggle("active", item === button);
       });
 
-    document
-      .getElementById("searchInput")
-      .addEventListener("input", filterListings);
+      applyFilters();
+    });
 
-    document
-      .querySelectorAll(".category")
-      .forEach(function(category) {
-
-        category.addEventListener("click", function() {
-
-          const selectedCategory =
-            category.dataset.category;
-
-          const filtered =
-            allListings.filter(function(listing) {
-
-              return String(
-                listing.category || ""
-              ).toLowerCase() ===
-              selectedCategory.toLowerCase();
-
-            });
-
-          document.getElementById("featured")
-            .scrollIntoView();
-
-          renderListings(filtered);
-        });
-
-      });
-
-    function goToSellPage(event) {
-      event.preventDefault();
-      window.location.href = "sell.html";
+    function sellingNotice() {
+      alert("The selling page is not connected yet. We can build it next.");
     }
 
-    document
-      .getElementById("sellButton")
-      .addEventListener("click", goToSellPage);
-
-    document
-      .getElementById("startSellingButton")
-      .addEventListener("click", goToSellPage);
-
-    document
-      .getElementById("sellBottomButton")
-      .addEventListener("click", goToSellPage);
-
-    document
-      .getElementById("loginLink")
-      .addEventListener("click", function(event) {
-        event.preventDefault();
-        alert("Login page will be connected next.");
-      });
+    document.getElementById("sellButton").addEventListener("click", sellingNotice);
+    document.getElementById("sellBannerButton").addEventListener("click", sellingNotice);
 
     loadListings();
   </script>
-
 </body>
 </html>
