@@ -254,9 +254,59 @@
 
       <div class="grid">
         <div class="field">
-          <label for="price">Price (USD) *</label>
+          <label for="price">Price in your selected currency *</label>
           <input id="price" type="number" min="0.01" max="999999999"
-                 step="0.01" required placeholder="15.00">
+                 step="0.01" required placeholder="e.g. 55.00">
+        </div>
+        <div class="field">
+          <label for="sellerCountry">Seller country *</label>
+          <select id="sellerCountry" required>
+            <option value="AE" data-currency="AED">United Arab Emirates (AED)</option>
+            <option value="US" data-currency="USD">United States (USD)</option>
+            <option value="GB" data-currency="GBP">United Kingdom (GBP)</option>
+            <option value="IN" data-currency="INR">India (INR)</option>
+            <option value="PK" data-currency="PKR">Pakistan (PKR)</option>
+            <option value="SA" data-currency="SAR">Saudi Arabia (SAR)</option>
+            <option value="QA" data-currency="QAR">Qatar (QAR)</option>
+            <option value="KW" data-currency="KWD">Kuwait (KWD)</option>
+            <option value="BH" data-currency="BHD">Bahrain (BHD)</option>
+            <option value="OM" data-currency="OMR">Oman (OMR)</option>
+            <option value="EU" data-currency="EUR">Euro area (EUR)</option>
+            <option value="CA" data-currency="CAD">Canada (CAD)</option>
+            <option value="AU" data-currency="AUD">Australia (AUD)</option>
+            <option value="NZ" data-currency="NZD">New Zealand (NZD)</option>
+            <option value="CN" data-currency="CNY">China (CNY)</option>
+            <option value="JP" data-currency="JPY">Japan (JPY)</option>
+            <option value="KR" data-currency="KRW">South Korea (KRW)</option>
+            <option value="SG" data-currency="SGD">Singapore (SGD)</option>
+            <option value="MY" data-currency="MYR">Malaysia (MYR)</option>
+            <option value="ID" data-currency="IDR">Indonesia (IDR)</option>
+            <option value="PH" data-currency="PHP">Philippines (PHP)</option>
+            <option value="TH" data-currency="THB">Thailand (THB)</option>
+            <option value="TR" data-currency="TRY">Türkiye (TRY)</option>
+            <option value="ZA" data-currency="ZAR">South Africa (ZAR)</option>
+            <option value="NG" data-currency="NGN">Nigeria (NGN)</option>
+            <option value="EG" data-currency="EGP">Egypt (EGP)</option>
+            <option value="BR" data-currency="BRL">Brazil (BRL)</option>
+            <option value="MX" data-currency="MXN">Mexico (MXN)</option>
+            <option value="CH" data-currency="CHF">Switzerland (CHF)</option>
+            <option value="SE" data-currency="SEK">Sweden (SEK)</option>
+            <option value="NO" data-currency="NOK">Norway (NOK)</option>
+            <option value="DK" data-currency="DKK">Denmark (DKK)</option>
+            <option value="PL" data-currency="PLN">Poland (PLN)</option>
+            <option value="RU" data-currency="RUB">Russia (RUB)</option>
+            <option value="BD" data-currency="BDT">Bangladesh (BDT)</option>
+            <option value="LK" data-currency="LKR">Sri Lanka (LKR)</option>
+            <option value="NP" data-currency="NPR">Nepal (NPR)</option>
+            <option value="VN" data-currency="VND">Vietnam (VND)</option>
+            <option value="KE" data-currency="KES">Kenya (KES)</option>
+            <option value="GH" data-currency="GHS">Ghana (GHS)</option>
+          </select>
+          <label for="currency" style="margin-top:12px">Listing currency *</label>
+          <select id="currency" required>
+            <option>AED</option><option>USD</option><option>GBP</option><option>INR</option><option>PKR</option><option>SAR</option><option>QAR</option><option>KWD</option><option>BHD</option><option>OMR</option><option>EUR</option><option>CAD</option><option>AUD</option><option>NZD</option><option>CNY</option><option>JPY</option><option>KRW</option><option>SGD</option><option>MYR</option><option>IDR</option><option>PHP</option><option>THB</option><option>TRY</option><option>ZAR</option><option>NGN</option><option>EGP</option><option>BRL</option><option>MXN</option><option>CHF</option><option>SEK</option><option>NOK</option><option>DKK</option><option>PLN</option><option>RUB</option><option>BDT</option><option>LKR</option><option>NPR</option><option>VND</option><option>KES</option><option>GHS</option>
+          </select>
+          <p class="hint">Choose the currency you are actually charging buyers in. Prices shown in other currencies are estimates.</p>
         </div>
 
         <div class="field">
@@ -567,6 +617,15 @@
     showMessage("You have logged out.", "success");
   });
 
+  const sellerCountry = document.getElementById("sellerCountry");
+  const sellerCurrency = document.getElementById("currency");
+  sellerCountry.addEventListener("change", function() {
+    const option = sellerCountry.options[sellerCountry.selectedIndex];
+    const currency = option && option.dataset.currency;
+    if (currency) sellerCurrency.value = currency;
+  });
+  sellerCurrency.value = "AED";
+
   const photoInput = document.getElementById("photos");
   const preview = document.getElementById("preview");
 
@@ -688,7 +747,7 @@
         title: title,
         description: description || null,
         price: price,
-        currency: "USD",
+        currency: document.getElementById("currency").value,
         condition: condition,
         location: location,
         allow_offers: allowOffers,
