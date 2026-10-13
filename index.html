@@ -353,6 +353,11 @@
 
       <div class="nav-actions">
         <a class="btn" href="#products">Browse Products</a>
+        <label for="displayCurrency" class="currency-label">Display prices in
+          <select id="displayCurrency" aria-label="Display prices in currency" style="padding:9px;border:1px solid #e5e7eb;border-radius:8px;max-width:110px">
+            <option>AED</option><option>USD</option><option>GBP</option><option>EUR</option><option>INR</option><option>PKR</option><option>SAR</option><option>CAD</option><option>AUD</option><option>CNY</option><option>JPY</option><option>SGD</option><option>NZD</option><option>TRY</option><option>ZAR</option><option>NGN</option><option>EGP</option><option>BRL</option><option>MXN</option><option>CHF</option><option>BDT</option><option>PHP</option><option>THB</option><option>MYR</option><option>IDR</option><option>VND</option><option>KES</option><option>GHS</option><option>QAR</option><option>KWD</option><option>BHD</option><option>OMR</option>
+          </select>
+        </label>
         <button class="btn btn-primary" id="sellButton" type="button">＋ Sell an Item</button>
       </div>
     </nav>
@@ -417,6 +422,7 @@
   <footer>
     <p><strong>Quick Cart</strong> — Buy Smart. Sell Easy.</p>
     <p style="margin-top:6px">A marketplace for discovering products and local deals.</p>
+    <p style="margin-top:6px;font-size:11px">*Currency conversions are estimates using daily rates. <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener">Rates by Exchange Rate API</a>.</p>
   </footer>
 
   <script>
@@ -433,6 +439,61 @@
 
     let allListings = [];
     let activeCategory = "all";
+    const CURRENCY_KEY = "quickCartDisplayCurrency";
+    let exchangeRates = null;
+    let exchangeRatesPromise = null;
+
+    function getDisplayCurrency() {
+      return localStorage.getItem(CURRENCY_KEY) || "AED";
+    }
+
+    async function getExchangeRates() {
+      if (exchangeRates) return exchangeRates;
+      if (exchangeRatesPromise) return exchangeRatesPromise;
+      exchangeRatesPromise = (async function() {
+        const cached = localStorage.getItem("quickCartUsdRates");
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (parsed.savedAt && Date.now() - parsed.savedAt < 24 * 60 * 60 * 1000 && parsed.rates) {
+              exchangeRates = parsed.rates;
+              return exchangeRates;
+            }
+          } catch (_) {}
+        }
+        const response = await fetch("https://open.er-api.com/v6/latest/USD");
+        if (!response.ok) throw new Error("Exchange rates unavailable");
+        const data = await response.json();
+        if (data.result !== "success" || !data.rates) throw new Error("Exchange rates unavailable");
+        exchangeRates = data.rates;
+        localStorage.setItem("quickCartUsdRates", JSON.stringify({savedAt: Date.now(), rates: data.rates}));
+        return exchangeRates;
+      })();
+      try { return await exchangeRatesPromise; }
+      finally { exchangeRatesPromise = null; }
+    }
+
+    function formatCurrency(amount, currency) {
+      return new Intl.NumberFormat("en", {style:"currency", currency:currency, maximumFractionDigits:2}).format(amount);
+    }
+
+    async function convertPrice(amount, fromCurrency, toCurrency) {
+      if (!Number.isFinite(amount)) return null;
+      if (fromCurrency === toCurrency) return amount;
+      const rates = await getExchangeRates();
+      if (!rates[fromCurrency] || !rates[toCurrency]) throw new Error("Currency not supported");
+      return amount / rates[fromCurrency] * rates[toCurrency];
+    }
+
+    function setupCurrencyPicker() {
+      const picker = document.getElementById("displayCurrency");
+      if (!picker) return;
+      picker.value = getDisplayCurrency();
+      picker.addEventListener("change", function() {
+        localStorage.setItem(CURRENCY_KEY, picker.value);
+        applyFilters();
+      });
+    }
 
     function showStatus(title, message, isError = false) {
       container.replaceChildren();
@@ -538,15 +599,18 @@
         price.className = "price";
 
         const amount = Number(listing.price);
-        const currency = listing.currency || "USD";
-
+        const originalCurrency = listing.currency || "USD";
+        const displayCurrency = getDisplayCurrency();
         price.textContent = Number.isFinite(amount)
-          ? new Intl.NumberFormat("en", {
-              style: "currency",
-              currency: currency,
-              maximumFractionDigits: 2
-            }).format(amount)
+          ? (originalCurrency === displayCurrency ? formatCurrency(amount, originalCurrency) : formatCurrency(amount, originalCurrency) + " (" + displayCurrency + " conversion…)")
           : (listing.price || "Price not listed");
+        if (Number.isFinite(amount) && originalCurrency !== displayCurrency) {
+          convertPrice(amount, originalCurrency, displayCurrency).then(function(converted) {
+            if (price.isConnected) price.textContent = "≈ " + formatCurrency(converted, displayCurrency) + "*";
+          }).catch(function() {
+            if (price.isConnected) price.textContent = formatCurrency(amount, originalCurrency) + " (conversion unavailable)";
+          });
+        }
 
         const meta = document.createElement("div");
         meta.className = "product-meta";
@@ -682,6 +746,7 @@
     document.getElementById("sellButton").addEventListener("click", sellingNotice);
     document.getElementById("sellBannerButton").addEventListener("click", sellingNotice);
 
+    setupCurrencyPicker();
     loadListings();
   </script>
 </body>
