@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,10 +209,29 @@
       <button id="authButton" class="btn primary full" type="submit">Log In</button>
     </form>
 
+    <p id="forgotPasswordRow" class="hint">
+      <a id="forgotPasswordLink" href="#">Forgot password?</a>
+    </p>
+
     <p class="hint">
       If you create an account, Supabase may ask you to confirm your email before
       you can log in. Never share your password with anyone.
     </p>
+  </section>
+
+  <section id="passwordResetCard" class="card hidden">
+    <h2>Choose a new password</h2>
+    <p class="subtitle">Enter a new password for your Quick Cart seller account.</p>
+    <form id="passwordResetForm">
+      <div class="field">
+        <label for="newPassword">New password</label>
+        <input id="newPassword" type="password" required minlength="6"
+               autocomplete="new-password" placeholder="At least 6 characters">
+      </div>
+      <button id="savePasswordButton" class="btn primary full" type="submit">
+        Save New Password
+      </button>
+    </form>
   </section>
 
   <section id="sellerCard" class="card hidden">
@@ -318,17 +336,21 @@
 
   const pageMessage = document.getElementById("pageMessage");
   const authCard = document.getElementById("authCard");
+  const passwordResetCard = document.getElementById("passwordResetCard");
+  const passwordResetForm = document.getElementById("passwordResetForm");
   const sellerCard = document.getElementById("sellerCard");
   const listingCard = document.getElementById("listingCard");
   const authForm = document.getElementById("authForm");
   const listingForm = document.getElementById("listingForm");
+  const forgotPasswordRow = document.getElementById("forgotPasswordRow");
+  const forgotPasswordLink = document.getElementById("forgotPasswordLink");
 
   let authMode = "login";
+  let isPasswordRecovery = false;
 
-  function showMessage(text, type) {
-    pageMessage.textContent = text;
+  function showMessage(message, type) {
+    pageMessage.textContent = message;
     pageMessage.className = "message " + type;
-    pageMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function clearMessage() {
@@ -338,35 +360,25 @@
 
   function setAuthMode(mode) {
     authMode = mode;
-    clearMessage();
 
-    document.getElementById("loginTab").classList.toggle("selected", mode === "login");
-    document.getElementById("signupTab").classList.toggle("selected", mode === "signup");
-    document.getElementById("nameField").classList.toggle("hidden", mode !== "signup");
-    document.getElementById("fullName").required = mode === "signup";
-    document.getElementById("authButton").textContent =
-      mode === "login" ? "Log In" : "Create Account";
-    document.getElementById("password").autocomplete =
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
+    const nameField = document.getElementById("nameField");
+    const passwordInput = document.getElementById("password");
+    const authButton = document.getElementById("authButton");
+
+    loginTab.classList.toggle("selected", mode === "login");
+    signupTab.classList.toggle("selected", mode === "signup");
+    nameField.classList.toggle("hidden", mode !== "signup");
+    forgotPasswordRow.classList.toggle("hidden", mode !== "login");
+
+    passwordInput.autocomplete =
       mode === "login" ? "current-password" : "new-password";
-  }
 
-  async function updateSessionView() {
-    const { data, error } = await db.auth.getSession();
+    authButton.textContent =
+      mode === "login" ? "Log In" : "Create Account";
 
-    if (error) {
-      showMessage("Could not check your login: " + error.message, "error");
-      return;
-    }
-
-    const user = data.session ? data.session.user : null;
-
-    authCard.classList.toggle("hidden", !!user);
-    sellerCard.classList.toggle("hidden", !user);
-    listingCard.classList.toggle("hidden", !user);
-
-    if (user) {
-      document.getElementById("sellerEmail").textContent = user.email || "Signed-in seller";
-    }
+    clearMessage();
   }
 
   document.getElementById("loginTab").addEventListener("click", function() {
@@ -377,11 +389,115 @@
     setAuthMode("signup");
   });
 
+  async function updateSessionView() {
+    const result = await db.auth.getSession();
+
+    if (result.error) {
+      showMessage(result.error.message, "error");
+      return;
+    }
+
+    const session = result.data.session;
+
+    if (session && session.user) {
+      authCard.classList.add("hidden");
+      passwordResetCard.classList.add("hidden");
+      sellerCard.classList.remove("hidden");
+      listingCard.classList.remove("hidden");
+
+      document.getElementById("sellerEmail").textContent =
+        session.user.email || "";
+    } else {
+      authCard.classList.remove("hidden");
+      sellerCard.classList.add("hidden");
+      listingCard.classList.add("hidden");
+    }
+  }
+
+  forgotPasswordLink.addEventListener("click", async function(event) {
+    event.preventDefault();
+    clearMessage();
+
+    const email = document.getElementById("email").value.trim();
+
+    if (!email) {
+      showMessage("Please enter your email address first.", "error");
+      document.getElementById("email").focus();
+      return;
+    }
+
+    forgotPasswordLink.textContent = "Sending reset email…";
+    forgotPasswordLink.style.pointerEvents = "none";
+
+    try {
+      const result = await db.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname
+      });
+
+      if (result.error) throw result.error;
+
+      showMessage(
+        "If an account exists for this email, a password-reset link will be sent. Check your inbox and spam folder.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Password reset request error:", error);
+      showMessage(
+        error.message || "Could not send the password-reset email.",
+        "error"
+      );
+    } finally {
+      forgotPasswordLink.textContent = "Forgot password?";
+      forgotPasswordLink.style.pointerEvents = "";
+    }
+  });
+
+  passwordResetForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+    clearMessage();
+
+    const button = document.getElementById("savePasswordButton");
+    const newPassword = document.getElementById("newPassword").value;
+
+    button.disabled = true;
+    button.textContent = "Saving…";
+
+    try {
+      if (!isPasswordRecovery) {
+        throw new Error(
+          "Please open the newest password-reset link from your email first."
+        );
+      }
+
+      const result = await db.auth.updateUser({ password: newPassword });
+
+      if (result.error) throw result.error;
+
+      isPasswordRecovery = false;
+      passwordResetForm.reset();
+      passwordResetCard.classList.add("hidden");
+
+      await updateSessionView();
+
+      showMessage(
+        "Your password has been updated. You can now continue using Quick Cart.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Password update error:", error);
+      showMessage(error.message || "Could not update your password.", "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Save New Password";
+    }
+  });
+
   authForm.addEventListener("submit", async function(event) {
     event.preventDefault();
     clearMessage();
 
     const button = document.getElementById("authButton");
+
     button.disabled = true;
     button.textContent = "Please wait…";
 
@@ -390,19 +506,26 @@
 
     try {
       if (authMode === "login") {
-        const result = await db.auth.signInWithPassword({ email, password });
+        const result = await db.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
 
         if (result.error) throw result.error;
 
         authForm.reset();
         await updateSessionView();
-        showMessage("You are logged in. You can now publish a listing.", "success");
+
+        showMessage(
+          "You are logged in. You can now publish a listing.",
+          "success"
+        );
       } else {
         const fullName = document.getElementById("fullName").value.trim();
 
         const result = await db.auth.signUp({
-          email,
-          password,
+          email: email,
+          password: password,
           options: {
             data: { full_name: fullName }
           }
@@ -427,7 +550,8 @@
       showMessage(error.message || "Authentication failed.", "error");
     } finally {
       button.disabled = false;
-      button.textContent = authMode === "login" ? "Log In" : "Create Account";
+      button.textContent =
+        authMode === "login" ? "Log In" : "Create Account";
     }
   });
 
@@ -459,11 +583,16 @@
     }
 
     for (const file of files) {
-      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
-          file.size > 5 * 1024 * 1024) {
+      if (
+        !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+        file.size > 5 * 1024 * 1024
+      ) {
         photoInput.value = "";
         preview.replaceChildren();
-        showMessage("Use JPG, PNG, or WebP images no larger than 5 MB each.", "error");
+        showMessage(
+          "Use JPG, PNG, or WebP images no larger than 5 MB each.",
+          "error"
+        );
         return;
       }
     }
@@ -506,7 +635,9 @@
         .maybeSingle();
 
       if (profileError) {
-        throw new Error("Could not verify your seller profile: " + profileError.message);
+        throw new Error(
+          "Could not verify your seller profile: " + profileError.message
+        );
       }
 
       if (!profile) {
@@ -528,9 +659,13 @@
       const allowOffers = document.getElementById("allowOffers").checked;
       const files = Array.from(photoInput.files || []);
 
-      if (!title || !category || !condition || !location ||
-          !Number.isFinite(price) || price <= 0) {
-        throw new Error("Please complete all required fields with valid values.");
+      if (
+        !title || !category || !condition || !location ||
+        !Number.isFinite(price) || price <= 0
+      ) {
+        throw new Error(
+          "Please complete all required fields with valid values."
+        );
       }
 
       if (files.length > 5) {
@@ -538,9 +673,13 @@
       }
 
       for (const file of files) {
-        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
-            file.size > 5 * 1024 * 1024) {
-          throw new Error("Each photo must be JPG, PNG, or WebP and no larger than 5 MB.");
+        if (
+          !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+          file.size > 5 * 1024 * 1024
+        ) {
+          throw new Error(
+            "Each photo must be JPG, PNG, or WebP and no larger than 5 MB."
+          );
         }
       }
 
@@ -564,7 +703,9 @@
         .single();
 
       if (insertResult.error) {
-        throw new Error("Listing could not be saved: " + insertResult.error.message);
+        throw new Error(
+          "Listing could not be saved: " + insertResult.error.message
+        );
       }
 
       savedListing = insertResult.data;
@@ -573,6 +714,7 @@
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+
         const extension = file.type === "image/png" ? "png" :
           file.type === "image/webp" ? "webp" : "jpg";
 
@@ -589,6 +731,7 @@
 
         if (uploadResult.error) {
           photoUploadFailed = true;
+
           throw new Error(
             "The listing was created, but its photo could not be uploaded: " +
             uploadResult.error.message
@@ -607,10 +750,13 @@
       }
 
       if (imageRows.length) {
-        const imageResult = await db.from("listing_images").insert(imageRows);
+        const imageResult = await db
+          .from("listing_images")
+          .insert(imageRows);
 
         if (imageResult.error) {
           photoUploadFailed = true;
+
           throw new Error(
             "The listing was created, but its photo record could not be saved: " +
             imageResult.error.message
@@ -624,12 +770,14 @@
       showMessage("Your listing was published successfully!", "success");
 
       const link = document.createElement("a");
-      link.href = "./listing.html?id=" + encodeURIComponent(savedListing.id);
+      link.href = "./listing.html?id=" +
+        encodeURIComponent(savedListing.id);
       link.textContent = " View your listing";
       link.style.display = "inline-block";
       link.style.marginTop = "10px";
       link.style.color = "#ea580c";
       link.style.fontWeight = "bold";
+
       pageMessage.appendChild(document.createElement("br"));
       pageMessage.appendChild(link);
 
@@ -639,7 +787,8 @@
       let text = error.message || "Something went wrong.";
 
       if (savedListing && photoUploadFailed) {
-        text += " Your listing exists, but photo saving needs to be fixed. Do not submit it again yet.";
+        text +=
+          " Your listing exists, but photo saving needs to be fixed. Do not submit it again yet.";
       }
 
       showMessage(text, "error");
@@ -649,8 +798,26 @@
     }
   });
 
-  db.auth.onAuthStateChange(function() {
-    updateSessionView();
+  db.auth.onAuthStateChange(function(event) {
+    if (event === "PASSWORD_RECOVERY") {
+      isPasswordRecovery = true;
+
+      authCard.classList.add("hidden");
+      sellerCard.classList.add("hidden");
+      listingCard.classList.add("hidden");
+      passwordResetCard.classList.remove("hidden");
+
+      showMessage(
+        "Password reset verified. Choose your new password below.",
+        "success"
+      );
+
+      return;
+    }
+
+    if (!isPasswordRecovery) {
+      updateSessionView();
+    }
   });
 
   setAuthMode("login");
