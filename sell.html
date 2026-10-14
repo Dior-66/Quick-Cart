@@ -9,14 +9,12 @@
 
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: #f8fafc;
       color: #222;
     }
-
     header {
       background: white;
       border-bottom: 1px solid #e5e7eb;
@@ -27,29 +25,24 @@
       gap: 15px;
       flex-wrap: wrap;
     }
-
     .brand {
       font-size: 25px;
       font-weight: 800;
       color: #f97316;
       text-decoration: none;
     }
-
     .home {
       color: #333;
       text-decoration: none;
       font-weight: 700;
     }
-
     main {
       max-width: 800px;
       margin: 35px auto;
       padding: 0 18px;
     }
-
     h1 { font-size: 32px; margin-bottom: 8px; }
     .subtitle { color: #6b7280; line-height: 1.6; }
-
     .card {
       background: white;
       border: 1px solid #e5e7eb;
@@ -58,16 +51,13 @@
       margin: 22px 0;
       box-shadow: 0 6px 22px rgba(0,0,0,.04);
     }
-
     h2 { margin-top: 0; font-size: 22px; }
     .field { margin-bottom: 18px; }
-
     label {
       display: block;
       font-weight: 700;
       margin-bottom: 7px;
     }
-
     input, select, textarea {
       width: 100%;
       padding: 12px;
@@ -76,17 +66,16 @@
       background: white;
       font: inherit;
     }
-
     textarea { min-height: 110px; resize: vertical; }
-
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-
-    button { font: inherit; cursor: pointer; }
-
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
     .btn {
       padding: 12px 17px;
       border: 1px solid #e5e7eb;
@@ -94,31 +83,25 @@
       background: white;
       font-weight: 700;
     }
-
     .primary {
       background: #f97316;
       color: white;
       border-color: #f97316;
     }
-
     .primary:hover { background: #ea580c; }
     .full { width: 100%; }
     button:disabled { opacity: .6; cursor: wait; }
-
     .auth-tabs {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
     }
-
     .auth-tabs button { flex: 1; }
-
     .auth-tabs .selected {
       background: #fff7ed;
       border-color: #f97316;
       color: #ea580c;
     }
-
     .message {
       display: none;
       padding: 13px;
@@ -127,67 +110,63 @@
       overflow-wrap: anywhere;
       line-height: 1.5;
     }
-
     .message.error {
       display: block;
       background: #fee2e2;
       color: #991b1b;
     }
-
     .message.success {
       display: block;
       background: #dcfce7;
       color: #166534;
     }
-
     .hidden { display: none !important; }
-
     .upload {
       background: #fff7ed;
       border: 2px dashed #fdba74;
       border-radius: 12px;
       padding: 20px;
     }
-
     .hint {
       color: #6b7280;
       font-size: 13px;
       line-height: 1.6;
     }
-
     .preview {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       margin-top: 12px;
     }
-
     .preview-item {
-      position: relative;
-      width: 90px;
-    }
-
-    .preview img {
-      width: 90px;
-      height: 90px;
-      object-fit: contain;
+      width: 112px;
+      padding: 7px;
       border: 1px solid #e5e7eb;
-      border-radius: 8px;
+      border-radius: 10px;
       background: white;
     }
-
-    .preview .main-photo img {
-      border: 2px solid #f97316;
+    .preview-item.main-photo { border: 2px solid #f97316; }
+    .preview-item img {
+      display: block;
+      width: 94px;
+      height: 90px;
+      object-fit: contain;
+      border-radius: 7px;
+      background: white;
     }
-
     .photo-label {
       display: block;
-      font-size: 11px;
-      text-align: center;
-      color: #6b7280;
-      margin-top: 4px;
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
     }
-
+    .remove-photo {
+      width: 100%;
+      padding: 5px;
+      margin-top: 6px;
+      font-size: 12px;
+    }
     .account {
       background: #fff7ed;
       padding: 12px;
@@ -195,14 +174,12 @@
       overflow-wrap: anywhere;
       margin-bottom: 20px;
     }
-
     footer {
       text-align: center;
       padding: 25px;
       color: #6b7280;
       font-size: 13px;
     }
-
     @media (max-width: 600px) {
       .grid { grid-template-columns: 1fr; gap: 0; }
       .card { padding: 18px; }
@@ -219,17 +196,13 @@
 
 <main>
   <h1>Sell an Item</h1>
-  <p class="subtitle">
-    Sign in to your seller account, then list your product on Quick Cart.
-  </p>
+  <p class="subtitle">Sign in to your seller account, then list your product on Quick Cart.</p>
 
   <div id="pageMessage" class="message" role="status" aria-live="polite"></div>
 
   <section id="authCard" class="card">
     <h2>Seller Account</h2>
-    <p class="subtitle">
-      Sign in with your existing account or create a new account.
-    </p>
+    <p class="subtitle">Sign in with your existing account or create a new account.</p>
 
     <div class="auth-tabs">
       <button type="button" id="loginTab" class="btn selected">Log In</button>
@@ -251,13 +224,10 @@
       <div class="field">
         <label for="password">Password</label>
         <input id="password" type="password" required minlength="6"
-               autocomplete="current-password"
-               placeholder="At least 6 characters">
+               autocomplete="current-password" placeholder="At least 6 characters">
       </div>
 
-      <button id="authButton" class="btn primary full" type="submit">
-        Log In
-      </button>
+      <button id="authButton" class="btn primary full" type="submit">Log In</button>
     </form>
 
     <p id="forgotPasswordRow" class="hint">
@@ -265,25 +235,20 @@
     </p>
 
     <p class="hint">
-      If you create an account, Supabase may ask you to confirm your email
-      before you can log in. Never share your password with anyone.
+      If you create an account, Supabase may ask you to confirm your email before
+      you can log in. Never share your password with anyone.
     </p>
   </section>
 
   <section id="passwordResetCard" class="card hidden">
     <h2>Choose a new password</h2>
-    <p class="subtitle">
-      Enter a new password for your Quick Cart seller account.
-    </p>
-
+    <p class="subtitle">Enter a new password for your Quick Cart seller account.</p>
     <form id="passwordResetForm">
       <div class="field">
         <label for="newPassword">New password</label>
         <input id="newPassword" type="password" required minlength="6"
-               autocomplete="new-password"
-               placeholder="At least 6 characters">
+               autocomplete="new-password" placeholder="At least 6 characters">
       </div>
-
       <button id="savePasswordButton" class="btn primary full" type="submit">
         Save New Password
       </button>
@@ -314,7 +279,6 @@
           <input id="price" type="number" min="0.01" max="999999999"
                  step="0.01" required placeholder="e.g. 55.00">
         </div>
-
         <div class="field">
           <label for="sellerCountry">Seller country *</label>
           <select id="sellerCountry" required>
@@ -359,39 +323,17 @@
             <option value="KE" data-currency="KES">Kenya (KES)</option>
             <option value="GH" data-currency="GHS">Ghana (GHS)</option>
           </select>
-
-          <label for="currency" style="margin-top:12px">
-            Listing currency *
-          </label>
+          <label for="currency" style="margin-top:12px">Listing currency *</label>
           <select id="currency" required>
-            <option>AED</option><option>USD</option><option>GBP</option>
-            <option>INR</option><option>PKR</option><option>SAR</option>
-            <option>QAR</option><option>KWD</option><option>BHD</option>
-            <option>OMR</option><option>EUR</option><option>CAD</option>
-            <option>AUD</option><option>NZD</option><option>CNY</option>
-            <option>JPY</option><option>KRW</option><option>SGD</option>
-            <option>MYR</option><option>IDR</option><option>PHP</option>
-            <option>THB</option><option>TRY</option><option>ZAR</option>
-            <option>NGN</option><option>EGP</option><option>BRL</option>
-            <option>MXN</option><option>CHF</option><option>SEK</option>
-            <option>NOK</option><option>DKK</option><option>PLN</option>
-            <option>RUB</option><option>BDT</option><option>LKR</option>
-            <option>NPR</option><option>VND</option><option>KES</option>
-            <option>GHS</option>
+            <option>AED</option><option>USD</option><option>GBP</option><option>INR</option><option>PKR</option><option>SAR</option><option>QAR</option><option>KWD</option><option>BHD</option><option>OMR</option><option>EUR</option><option>CAD</option><option>AUD</option><option>NZD</option><option>CNY</option><option>JPY</option><option>KRW</option><option>SGD</option><option>MYR</option><option>IDR</option><option>PHP</option><option>THB</option><option>TRY</option><option>ZAR</option><option>NGN</option><option>EGP</option><option>BRL</option><option>MXN</option><option>CHF</option><option>SEK</option><option>NOK</option><option>DKK</option><option>PLN</option><option>RUB</option><option>BDT</option><option>LKR</option><option>NPR</option><option>VND</option><option>KES</option><option>GHS</option>
           </select>
-
-          <p class="hint">
-            Choose the currency you are actually charging buyers in.
-            Prices shown in other currencies are estimates.
-          </p>
+          <p class="hint">Choose the currency you are actually charging buyers in. Prices shown in other currencies are estimates.</p>
         </div>
 
         <div class="field">
           <label for="category">Category *</label>
           <select id="category" required>
             <option value="">Choose category</option>
-
-            <!-- Older values retained for compatibility -->
             <option>Electronics</option>
             <option>Phones</option>
             <option>Computers</option>
@@ -400,29 +342,7 @@
             <option>Furniture</option>
             <option>Gaming</option>
             <option>Home &amp; Garden</option>
-
-            <!-- Requested categories -->
-            <option>Health &amp; Personal Care</option>
-            <option>Beauty &amp; Cosmetics</option>
-            <option>Clothing &amp; Fashion</option>
-            <option>Jewellery &amp; Watches</option>
-            <option>Bags &amp; Luggage</option>
-            <option>Kitchen &amp; Dining</option>
-            <option>Home Decor</option>
-            <option>Home Appliances</option>
-            <option>Sports &amp; Fitness</option>
             <option>Baby &amp; Kids</option>
-            <option>Toys &amp; Games</option>
-            <option>Books &amp; Stationery</option>
-            <option>Computers &amp; Accessories</option>
-            <option>Phones &amp; Accessories</option>
-            <option>Tools &amp; DIY</option>
-            <option>Garden &amp; Outdoor</option>
-            <option>Pet Supplies</option>
-            <option>Food &amp; Grocery</option>
-            <option>Office Supplies</option>
-            <option>Arts, Crafts &amp; Hobbies</option>
-            <option>Travel Accessories</option>
             <option>Other</option>
           </select>
         </div>
@@ -453,15 +373,17 @@
       </div>
 
       <div class="field">
-        <label for="photos">Product photos *</label>
+        <label>Product photos *</label>
         <div class="upload">
-          <input id="photos" type="file"
-                 accept="image/jpeg,image/png,image/webp"
-                 multiple required>
-          <p class="hint">
-            Choose 1–15 JPG, PNG, or WebP photos. Maximum 5 MB each.
-            The first photo will be the main product photo.
-          </p>
+          <div id="mainPhotoArea">
+            <button type="button" id="addMainPhoto" class="btn primary full">+ Add Main Photo</button>
+          </div>
+          <div id="extraPhotoArea" class="hidden">
+            <button type="button" id="addAnotherPhoto" class="btn full">+ Add Another Photo</button>
+          </div>
+          <input id="mainPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+          <input id="extraPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+          <p class="hint">Add 1–15 JPG, PNG, or WebP photos, up to 5 MB each. Add photos one at a time. The first photo is the main photo.</p>
           <div id="preview" class="preview"></div>
         </div>
       </div>
@@ -723,63 +645,93 @@
 
   const sellerCountry = document.getElementById("sellerCountry");
   const sellerCurrency = document.getElementById("currency");
-
   sellerCountry.addEventListener("change", function() {
     const option = sellerCountry.options[sellerCountry.selectedIndex];
     const currency = option && option.dataset.currency;
     if (currency) sellerCurrency.value = currency;
   });
-
   sellerCurrency.value = "AED";
 
-  const photoInput = document.getElementById("photos");
+  const mainPhotoInput = document.getElementById("mainPhotoInput");
+  const extraPhotoInput = document.getElementById("extraPhotoInput");
+  const addMainPhoto = document.getElementById("addMainPhoto");
+  const addAnotherPhoto = document.getElementById("addAnotherPhoto");
+  const mainPhotoArea = document.getElementById("mainPhotoArea");
+  const extraPhotoArea = document.getElementById("extraPhotoArea");
   const preview = document.getElementById("preview");
+  let selectedPhotos = [];
+  let previewUrls = [];
 
-  photoInput.addEventListener("change", function() {
-    preview.replaceChildren();
+  addMainPhoto.addEventListener("click", function() {
+    mainPhotoInput.click();
+  });
+
+  addAnotherPhoto.addEventListener("click", function() {
+    extraPhotoInput.click();
+  });
+
+  function addSelectedPhoto(file) {
     clearMessage();
+    if (!file) return;
 
-    const files = Array.from(photoInput.files || []);
-
-    if (files.length < 1 || files.length > 15) {
-      photoInput.value = "";
-      showMessage("Please choose between 1 and 15 photos.", "error");
+    if (selectedPhotos.length >= 15) {
+      showMessage("You can add a maximum of 15 photos.", "error");
       return;
     }
 
-    for (const file of files) {
-      if (
-        !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
-        file.size > 5 * 1024 * 1024
-      ) {
-        photoInput.value = "";
-        preview.replaceChildren();
-        showMessage(
-          "Use JPG, PNG, or WebP images no larger than 5 MB each.",
-          "error"
-        );
-        return;
-      }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      showMessage("Choose a JPG, PNG, or WebP photo no larger than 5 MB.", "error");
+      return;
     }
 
-    files.forEach(function(file, index) {
+    selectedPhotos.push(file);
+    renderPhotoPreviews();
+  }
+
+  mainPhotoInput.addEventListener("change", function() {
+    addSelectedPhoto(mainPhotoInput.files && mainPhotoInput.files[0]);
+    mainPhotoInput.value = "";
+  });
+
+  extraPhotoInput.addEventListener("change", function() {
+    addSelectedPhoto(extraPhotoInput.files && extraPhotoInput.files[0]);
+    extraPhotoInput.value = "";
+  });
+
+  function renderPhotoPreviews() {
+    previewUrls.forEach(function(url) { URL.revokeObjectURL(url); });
+    previewUrls = [];
+    preview.replaceChildren();
+    mainPhotoArea.classList.toggle("hidden", selectedPhotos.length > 0);
+    extraPhotoArea.classList.toggle("hidden", selectedPhotos.length === 0 || selectedPhotos.length >= 15);
+
+    selectedPhotos.forEach(function(file, index) {
       const item = document.createElement("div");
       item.className = "preview-item" + (index === 0 ? " main-photo" : "");
-
       const image = document.createElement("img");
-      image.alt = index === 0 ? "Main product photo preview" :
-        "Additional product photo preview";
+      image.alt = index === 0 ? "Main product photo preview" : "Additional product photo preview";
       image.src = URL.createObjectURL(file);
+      previewUrls.push(image.src);
 
       const label = document.createElement("span");
       label.className = "photo-label";
       label.textContent = index === 0 ? "Main photo" : "Photo " + (index + 1);
 
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "btn remove-photo";
+      removeButton.textContent = "Remove";
+      removeButton.addEventListener("click", function() {
+        selectedPhotos.splice(index, 1);
+        renderPhotoPreviews();
+      });
+
       item.appendChild(image);
       item.appendChild(label);
+      item.appendChild(removeButton);
       preview.appendChild(item);
     });
-  });
+  }
 
   listingForm.addEventListener("submit", async function(event) {
     event.preventDefault();
@@ -833,7 +785,7 @@
       const location = document.getElementById("location").value.trim();
       const description = document.getElementById("description").value.trim();
       const allowOffers = document.getElementById("allowOffers").checked;
-      const files = Array.from(photoInput.files || []);
+      const files = [...selectedPhotos];
 
       if (
         !title || !category || !condition || !location ||
@@ -845,7 +797,7 @@
       }
 
       if (files.length < 1 || files.length > 15) {
-        throw new Error("Please choose between 1 and 15 photos.");
+        throw new Error("Please add between 1 and 15 photos before publishing.");
       }
 
       for (const file of files) {
@@ -941,7 +893,8 @@
       }
 
       listingForm.reset();
-      preview.replaceChildren();
+      selectedPhotos = [];
+      renderPhotoPreviews();
 
       showMessage("Your listing was published successfully!", "success");
 
