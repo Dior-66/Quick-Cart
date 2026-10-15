@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | Quick Cart</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff7ed;
+      font-family: Arial, sans-serif;
+      color: #222;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 30px;
+      border-radius: 16px;
+      background: white;
+      box-shadow: 0 5px 24px #00000012;
+    }
+    h1 { color: #f97316; margin-top: 0; }
+    label { display: block; margin: 16px 0 7px; }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 13px;
+      border: 0;
+      border-radius: 8px;
+      background: #f97316;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; }
+    a { color: #ea580c; }
+    #message { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Join Quick Cart</h1>
+    <p>Create your account to buy and sell.</p>
+
+    <form id="signupForm">
+      <label for="name">Your name</label>
+      <input id="name" type="text" autocomplete="name" required>
+
+      <label for="email">Email address</label>
+      <input id="email" type="email" autocomplete="email" required>
+
+      <label for="password">Create password</label>
+      <input id="password" type="password"
+        autocomplete="new-password" minlength="8" required>
+
+      <button id="signupButton" type="submit">Create Account</button>
+    </form>
+
+    <p id="message" role="status"></p>
+    <p>Already have an account? <a href="login.html">Sign in</a></p>
+    <a href="index.html">Back to home</a>
+  </main>
+
+  <script type="module">
+    import { createClient } from
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    const supabase = createClient(
+      "https://dgnkmkyueqgbiahztuux.supabase.co",
+      "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_"
+    );
+
+    const form = document.getElementById("signupForm");
+    const message = document.getElementById("message");
+    const button = document.getElementById("signupButton");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.textContent = "";
+      button.disabled = true;
+      button.textContent = "Creating account...";
+
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: document.getElementById("email").value.trim(),
+          password: document.getElementById("password").value,
+          options: {
+            data: {
+              full_name: document.getElementById("name").value.trim()
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        if (data.session) {
+          message.textContent = "Account created! You are signed in.";
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 1200);
+        } else {
+          message.textContent =
+            "Account created! Check your email to confirm it, then sign in.";
+        }
+      } catch (error) {
+        message.textContent = error.message ||
+          "Could not create your account. Please try again.";
+      } finally {
+        button.disabled = false;
+        button.textContent = "Create Account";
+      }
+    });
+  </script>
+</body>
+</html>
