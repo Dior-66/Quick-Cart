@@ -218,6 +218,20 @@
       padding: 25px;
     }
 
+
+    .checkout-panel, .orders-panel { margin-top: 28px; padding: 24px; border: 1px solid #eee; border-radius: 14px; background: #fff; }
+    .checkout-panel h2, .orders-panel h2 { margin-bottom: 16px; }
+    .checkout-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .checkout-grid .full { grid-column: 1 / -1; }
+    .checkout-grid label { display: block; font-weight: 700; font-size: 14px; }
+    .checkout-grid input, .checkout-grid textarea { width: 100%; margin-top: 7px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font: inherit; }
+    .checkout-grid textarea { min-height: 90px; resize: vertical; }
+    .notice { margin: 12px 0; padding: 12px; border-radius: 8px; background: #fff7ed; color: #9a3412; line-height: 1.5; }
+    .order-item { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-top: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+    .order-item strong { color: #222; }
+    .button:disabled { opacity: .6; cursor: wait; }
+    @media (max-width: 600px) { .checkout-grid { grid-template-columns: 1fr; } .checkout-grid .full { grid-column: auto; } .checkout-panel, .orders-panel { padding: 18px; } }
+
     @media (max-width: 700px) {
       .container {
         margin: 20px auto;
@@ -471,6 +485,8 @@
         const listingError =
           listingResult.error;
 
+        currentListing = listing;
+
 
         if (listingError || !listing) {
 
@@ -624,8 +640,12 @@
 
               <div class="buttons">
 
+                <button type="button" class="button primary" id="buyNowButton" onclick="showCheckout()">
+                  Buy Now · Cash on Delivery
+                </button>
+
                 <button
-                  class="button primary"
+                  class="button secondary"
                   onclick="messageSeller()"
                 >
                   Message Seller
@@ -644,12 +664,40 @@
             </div>
 
           </div>
+
+          <section id="checkoutPanel" class="checkout-panel" hidden>
+            <h2>Cash on Delivery Checkout</h2>
+            <p style="color:#666;line-height:1.6;margin-bottom:16px">Confirm your contact details and delivery address. You will pay the seller when the item is delivered.</p>
+            <div class="notice">Payment is not collected online. This creates an order request in Quick Cart.</div>
+            <form id="checkoutForm">
+              <div class="checkout-grid">
+                <label>Full name<input id="buyerName" name="buyerName" autocomplete="name" required maxlength="120"></label>
+                <label>Phone number<input id="buyerPhone" name="buyerPhone" autocomplete="tel" required maxlength="40" placeholder="Include country code"></label>
+                <label class="full">Delivery address<textarea id="shippingAddress" name="shippingAddress" autocomplete="street-address" required maxlength="1000" placeholder="Building, street, area, city, and any delivery details"></textarea></label>
+              </div>
+              <p id="checkoutMessage" role="status" style="margin-top:12px;line-height:1.5"></p>
+              <div class="buttons" style="margin-top:18px">
+                <button id="placeOrderButton" type="submit" class="button primary">Place Order</button>
+                <button type="button" class="button secondary" onclick="hideCheckout()">Cancel</button>
+              </div>
+            </form>
+          </section>
+
+          <section id="ordersPanel" class="orders-panel">
+            <h2>My Orders</h2>
+            <p id="ordersMessage" style="color:#666;line-height:1.5">Sign in to view orders you have placed.</p>
+            <div id="ordersList"></div>
+            <button type="button" id="loadOrdersButton" class="button secondary" style="margin-top:14px" onclick="loadMyOrders()">Refresh My Orders</button>
+          </section>
         `;
 
 
         window.quickCartImages =
           imageUrls;
+        const checkoutForm = document.getElementById("checkoutForm");
+        if (checkoutForm) checkoutForm.addEventListener("submit", handleCheckoutSubmit);
         updateListingPrice();
+        loadMyOrders();
 
 
       } catch (error) {
@@ -724,6 +772,158 @@
 
     }
 
+
+
+    /* =========================
+       CHECKOUT / CASH ON DELIVERY
+    ========================= */
+    let currentListing = null;
+    let checkoutBusy = false;
+
+    async function showCheckout() {
+      if (!currentListing) return;
+      const { data: { user }, error } = await supabaseClient.auth.getUser();
+      if (error || !user) {
+        alert("Please sign in before placing an order. You will be taken to the login page.");
+        window.location.href = "login.html";
+        return;
+      }
+      if (currentListing.seller_id && currentListing.seller_id === user.id) {
+        alert("You cannot place an order for your own listing.");
+        return;
+      }
+      const panel = document.getElementById("checkoutPanel");
+      if (!panel) return;
+      panel.hidden = false;
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      const nameInput = document.getElementById("buyerName");
+      if (nameInput && !nameInput.value) {
+        const { data: profile } = await supabaseClient.from("profiles").select("full_name, phone").eq("id", user.id).maybeSingle();
+        if (profile?.full_name) nameInput.value = profile.full_name;
+        const phoneInput = document.getElementById("buyerPhone");
+        if (phoneInput && profile?.phone) phoneInput.value = profile.phone;
+      }
+    }
+
+    function hideCheckout() {
+      const panel = document.getElementById("checkoutPanel");
+      if (panel) panel.hidden = true;
+    }
+
+    function makeOrderNumber() {
+      const date = new Date();
+      const stamp = date.getFullYear().toString() + String(date.getMonth()+1).padStart(2,"0") + String(date.getDate()).padStart(2,"0");
+      const random = Math.random().toString(36).slice(2, 8).toUpperCase();
+      return "QC-" + stamp + "-" + random;
+    }
+
+    async function handleCheckoutSubmit(event) {
+      event.preventDefault();
+      if (checkoutBusy || !currentListing) return;
+      const message = document.getElementById("checkoutMessage");
+      const button = document.getElementById("placeOrderButton");
+      const buyerName = document.getElementById("buyerName").value.trim();
+      const buyerPhone = document.getElementById("buyerPhone").value.trim();
+      const shippingAddress = document.getElementById("shippingAddress").value.trim();
+      if (!buyerName || !buyerPhone || !shippingAddress) {
+        message.textContent = "Please complete all fields.";
+        return;
+      }
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+      if (authError || !user) {
+        message.textContent = "Your session has expired. Please sign in again.";
+        return;
+      }
+      if (!currentListing.seller_id) {
+        message.textContent = "This listing does not have a seller ID, so an order cannot be created. Please contact support.";
+        return;
+      }
+      if (currentListing.seller_id === user.id) {
+        message.textContent = "You cannot order your own listing.";
+        return;
+      }
+      const price = Number(currentListing.price);
+      if (!Number.isFinite(price) || price < 0) {
+        message.textContent = "This listing has an invalid price. Please contact the seller.";
+        return;
+      }
+      checkoutBusy = true;
+      button.disabled = true;
+      button.textContent = "Placing order…";
+      message.textContent = "Saving your order…";
+      const orderData = {
+        order_number: makeOrderNumber(),
+        listing_id: currentListing.id,
+        buyer_id: user.id,
+        seller_id: currentListing.seller_id,
+        buyer_name: buyerName,
+        buyer_phone: buyerPhone,
+        item_title: currentListing.title || "Quick Cart item",
+        quantity: 1,
+        original_price: price,
+        agreed_price: price,
+        order_status: "Pending Payment",
+        payment_status: "Unpaid",
+        delivery_method: "Cash on Delivery",
+        shipping_address: shippingAddress
+      };
+      try {
+        const { data, error } = await supabaseClient.from("orders").insert(orderData).select("order_number").single();
+        if (error) throw error;
+        message.textContent = "Order placed successfully! Your order number is " + (data?.order_number || orderData.order_number) + ". Payment is due on delivery.";
+        document.getElementById("checkoutForm").reset();
+        await loadMyOrders();
+      } catch (err) {
+        console.error("Quick Cart order error:", err);
+        message.textContent = "We could not save the order. " + (err?.message || "Please check your connection and Supabase order policies, then try again.");
+      } finally {
+        checkoutBusy = false;
+        button.disabled = false;
+        button.textContent = "Place Order";
+      }
+    }
+
+    /* =========================
+       MY ORDERS
+    ========================= */
+    async function loadMyOrders() {
+      const message = document.getElementById("ordersMessage");
+      const list = document.getElementById("ordersList");
+      if (!message || !list) return;
+      message.textContent = "Loading your orders…";
+      list.innerHTML = "";
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+      if (authError || !user) {
+        message.textContent = "Please sign in to view your orders.";
+        return;
+      }
+      const { data, error } = await supabaseClient
+        .from("orders")
+        .select("order_number,item_title,quantity,agreed_price,order_status,payment_status,delivery_method,created_at")
+        .eq("buyer_id", user.id)
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.error("Quick Cart My Orders error:", error);
+        message.textContent = "Could not load orders. Please check the orders table SELECT policy for signed-in buyers.";
+        return;
+      }
+      if (!data || data.length === 0) {
+        message.textContent = "You have not placed any orders yet.";
+        return;
+      }
+      message.textContent = "You have " + data.length + " order(s).";
+      list.innerHTML = data.map(order => `
+        <article class="order-item">
+          <div><strong>Order:</strong> ${escapeHtml(order.order_number || "—")}</div>
+          <div><strong>Item:</strong> ${escapeHtml(order.item_title || "Quick Cart item")}</div>
+          <div><strong>Quantity:</strong> ${escapeHtml(String(order.quantity ?? 1))}</div>
+          <div><strong>Agreed price:</strong> ${escapeHtml(String(order.agreed_price ?? "—"))} (seller's listing currency)</div>
+          <div><strong>Order status:</strong> ${escapeHtml(order.order_status || "—")}</div>
+          <div><strong>Payment:</strong> ${escapeHtml(order.payment_status || "—")} · ${escapeHtml(order.delivery_method || "Cash on Delivery")}</div>
+          <div><strong>Date:</strong> ${escapeHtml(order.created_at ? new Date(order.created_at).toLocaleString() : "—")}</div>
+        </article>
+      `).join("");
+    }
 
     /* =========================
        START
