@@ -7,6 +7,7 @@
   <title>Create Account | Quick Cart</title>
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       padding: 20px;
@@ -18,6 +19,7 @@
       font-family: Arial, sans-serif;
       color: #222;
     }
+
     .card {
       width: 100%;
       max-width: 420px;
@@ -26,15 +28,23 @@
       background: white;
       box-shadow: 0 5px 24px #00000012;
     }
+
     h1 { color: #f97316; margin-top: 0; }
-    label { display: block; margin: 16px 0 7px; }
-    input {
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+    }
+
+    input, select {
       width: 100%;
       padding: 12px;
       border: 1px solid #ddd;
       border-radius: 8px;
       font-size: 16px;
+      background: white;
     }
+
     button {
       width: 100%;
       margin-top: 20px;
@@ -47,32 +57,61 @@
       font-weight: bold;
       cursor: pointer;
     }
+
     button:disabled { opacity: .6; }
+
     a { color: #ea580c; }
+
     #message { overflow-wrap: anywhere; }
   </style>
 </head>
 <body>
   <main class="card">
     <h1>Join Quick Cart</h1>
-    <p>Create your account to buy and sell.</p>
+    <p>Create your account to buy or sell.</p>
 
     <form id="signupForm">
       <label for="name">Your name</label>
-      <input id="name" type="text" autocomplete="name" required>
+      <input
+        id="name"
+        type="text"
+        autocomplete="name"
+        required
+      >
 
       <label for="email">Email address</label>
-      <input id="email" type="email" autocomplete="email" required>
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        required
+      >
 
       <label for="password">Create password</label>
-      <input id="password" type="password"
-        autocomplete="new-password" minlength="8" required>
+      <input
+        id="password"
+        type="password"
+        autocomplete="new-password"
+        minlength="8"
+        required
+      >
 
-      <button id="signupButton" type="submit">Create Account</button>
+      <label for="accountType">I want to</label>
+      <select id="accountType" required>
+        <option value="buyer">Buy products</option>
+        <option value="seller">Sell products</option>
+      </select>
+
+      <button id="signupButton" type="submit">
+        Create Account
+      </button>
     </form>
 
     <p id="message" role="status"></p>
-    <p>Already have an account? <a href="login.html">Sign in</a></p>
+    <p>
+      Already have an account?
+      <a href="login.html">Sign in</a>
+    </p>
     <a href="index.html">Back to home</a>
   </main>
 
@@ -91,17 +130,28 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+
       message.textContent = "";
       button.disabled = true;
       button.textContent = "Creating account...";
 
       try {
+        const name =
+          document.getElementById("name").value.trim();
+        const email =
+          document.getElementById("email").value.trim();
+        const password =
+          document.getElementById("password").value;
+        const requestedRole =
+          document.getElementById("accountType").value;
+
         const { data, error } = await supabase.auth.signUp({
-          email: document.getElementById("email").value.trim(),
-          password: document.getElementById("password").value,
+          email,
+          password,
           options: {
             data: {
-              full_name: document.getElementById("name").value.trim()
+              full_name: name,
+              requested_role: requestedRole
             }
           }
         });
@@ -109,13 +159,15 @@
         if (error) throw error;
 
         if (data.session) {
-          message.textContent = "Account created! You are signed in.";
+          message.textContent =
+            "Account created. Your account type needs secure activation before you can use Buyer or Seller features.";
+
           setTimeout(() => {
             window.location.href = "index.html";
-          }, 1200);
+          }, 1800);
         } else {
           message.textContent =
-            "Account created! Check your email to confirm it, then sign in.";
+            "Account created! Check your email to confirm it. Your account type needs secure activation before you can use Buyer or Seller features.";
         }
       } catch (error) {
         message.textContent = error.message ||
