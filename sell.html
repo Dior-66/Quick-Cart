@@ -1,342 +1,167 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f97316">
-  <title>Sell an Item | Quick Cart</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f8fafc;
-      color: #222;
-    }
-    header {
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 17px 5%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    .brand {
-      font-size: 25px;
-      font-weight: 800;
-      color: #f97316;
-      text-decoration: none;
-    }
-    .home {
-      color: #333;
-      text-decoration: none;
-      font-weight: 700;
-    }
-    main {
-      max-width: 800px;
-      margin: 35px auto;
-      padding: 0 18px;
-    }
-    h1 { font-size: 32px; margin-bottom: 8px; }
-    .subtitle { color: #6b7280; line-height: 1.6; }
-    .card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 25px;
-      margin: 22px 0;
-      box-shadow: 0 6px 22px rgba(0,0,0,.04);
-    }
-    h2 { margin-top: 0; font-size: 22px; }
-    .field { margin-bottom: 18px; }
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 7px;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 9px;
-      background: white;
-      font: inherit;
-    }
-    textarea { min-height: 110px; resize: vertical; }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    button {
-      font: inherit;
-      cursor: pointer;
-    }
-    .btn {
-      padding: 12px 17px;
-      border: 1px solid #e5e7eb;
-      border-radius: 9px;
-      background: white;
-      font-weight: 700;
-    }
-    .primary {
-      background: #f97316;
-      color: white;
-      border-color: #f97316;
-    }
-    .primary:hover { background: #ea580c; }
-    .full { width: 100%; }
-    button:disabled { opacity: .6; cursor: wait; }
-    .auth-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .auth-tabs button { flex: 1; }
-    .auth-tabs .selected {
-      background: #fff7ed;
-      border-color: #f97316;
-      color: #ea580c;
-    }
-    .message {
-      display: none;
-      padding: 13px;
-      border-radius: 9px;
-      margin: 15px 0;
-      overflow-wrap: anywhere;
-      line-height: 1.5;
-    }
-    .message.error {
-      display: block;
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    .message.success {
-      display: block;
-      background: #dcfce7;
-      color: #166534;
-    }
-    .hidden { display: none !important; }
-    .upload {
-      background: #fff7ed;
-      border: 2px dashed #fdba74;
-      border-radius: 12px;
-      padding: 20px;
-    }
-    .hint {
-      color: #6b7280;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .preview {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-    .preview-item {
-      width: 112px;
-      padding: 7px;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      background: white;
-    }
-    .preview-item.main-photo { border: 2px solid #f97316; }
-    .preview-item img {
-      display: block;
-      width: 94px;
-      height: 90px;
-      object-fit: contain;
-      border-radius: 7px;
-      background: white;
-    }
-    .photo-label {
-      display: block;
-      margin-top: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
-    .remove-photo {
-      width: 100%;
-      padding: 5px;
-      margin-top: 6px;
-      font-size: 12px;
-    }
-    .account {
-      background: #fff7ed;
-      padding: 12px;
-      border-radius: 9px;
-      overflow-wrap: anywhere;
-      margin-bottom: 20px;
-    }
-    footer {
-      text-align: center;
-      padding: 25px;
-      color: #6b7280;
-      font-size: 13px;
-    }
-    @media (max-width: 600px) {
-      .grid { grid-template-columns: 1fr; gap: 0; }
-      .card { padding: 18px; }
-      h1 { font-size: 27px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f97316">
+<title>Sell an Item | Quick Cart</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f8fafc;color:#222}
+header{background:white;border-bottom:1px solid #e5e7eb;padding:17px 5%;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.brand{font-size:25px;font-weight:800;color:#f97316;text-decoration:none}
+.home{color:#333;text-decoration:none;font-weight:bold}
+main{max-width:800px;margin:35px auto;padding:0 18px}
+h1{font-size:32px;margin-bottom:8px}
+.subtitle,.hint{color:#6b7280;line-height:1.6}
+.card{background:white;border:1px solid #e5e7eb;border-radius:16px;padding:25px;margin:22px 0;box-shadow:0 6px 22px #00000008}
+h2{margin-top:0;font-size:22px}
+.field{margin-bottom:18px}
+label{display:block;font-weight:bold;margin-bottom:7px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:9px;background:white;font:inherit}
+textarea{min-height:110px;resize:vertical}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+button{font:inherit;cursor:pointer}
+.btn{padding:12px 17px;border:1px solid #e5e7eb;border-radius:9px;background:white;font-weight:bold}
+.primary{background:#f97316;color:white;border-color:#f97316}
+.primary:hover{background:#ea580c}
+.full{width:100%}
+button:disabled{opacity:.6;cursor:wait}
+.auth-tabs{display:flex;gap:10px;margin-bottom:20px}
+.auth-tabs button{flex:1}
+.auth-tabs .selected{background:#fff7ed;border-color:#f97316;color:#ea580c}
+.message{display:none;padding:13px;border-radius:9px;margin:15px 0;overflow-wrap:anywhere;line-height:1.5}
+.message.error{display:block;background:#fee2e2;color:#991b1b}
+.message.success{display:block;background:#dcfce7;color:#166534}
+.hidden{display:none!important}
+.upload{background:#fff7ed;border:2px dashed #fdba74;border-radius:12px;padding:20px}
+.hint{font-size:13px}
+.preview{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.preview-item{width:112px;padding:7px;border:1px solid #e5e7eb;border-radius:10px;background:white}
+.preview-item.main-photo{border:2px solid #f97316}
+.preview-item img{width:94px;height:90px;object-fit:contain}
+.photo-label{display:block;margin-top:6px;font-size:12px;font-weight:bold}
+.remove-photo{width:100%;padding:5px;margin-top:6px;font-size:12px}
+.account{background:#fff7ed;padding:12px;border-radius:9px;overflow-wrap:anywhere;margin-bottom:20px}
+footer{text-align:center;padding:25px;color:#6b7280;font-size:13px}
+@media(max-width:600px){.grid{grid-template-columns:1fr;gap:0}.card{padding:18px}h1{font-size:27px}}
+</style>
 </head>
-
 <body>
 <header>
-  <a class="brand" href="./index.html">🛒 Quick Cart</a>
-  <nav style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-    <a class="home" href="./seller-orders.html">📦 Seller Orders</a>
-    <a class="home" href="./index.html">← Back to Home</a>
-  </nav>
+<a class="brand" href="./index.html">🛒 Quick Cart</a>
+<nav style="display:flex;gap:16px;flex-wrap:wrap">
+<a class="home" href="./seller-orders.html">📦 Seller Orders</a>
+<a class="home" href="./index.html">← Back to Home</a>
+</nav>
 </header>
 
 <main>
-  <h1>Sell an Item</h1>
-  <p class="subtitle">Sign in to your seller account, then list your product on Quick Cart.</p>
+<h1>Sell an Item</h1>
+<p class="subtitle">Create your seller account or sign in to publish products on Quick Cart.</p>
+<div id="pageMessage" class="message" role="status" aria-live="polite"></div>
 
-  <div id="pageMessage" class="message" role="status" aria-live="polite"></div>
+<section id="authCard" class="card">
+<h2>Seller Account</h2>
+<p class="subtitle">Sign in or create a seller account.</p>
+<div class="auth-tabs">
+<button type="button" id="loginTab" class="btn selected">Log In</button>
+<button type="button" id="signupTab" class="btn">Sign Up</button>
+</div>
+<form id="authForm">
+<div id="nameField" class="field hidden">
+<label for="fullName">Full name</label>
+<input id="fullName" type="text" maxlength="100" autocomplete="name">
+</div>
+<div class="field">
+<label for="email">Email address</label>
+<input id="email" type="email" required autocomplete="email" placeholder="you@example.com">
+</div>
+<div class="field">
+<label for="password">Password</label>
+<input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters">
+</div>
+<button id="authButton" class="btn primary full" type="submit">Log In</button>
+</form>
+<p id="forgotPasswordRow" class="hint"><a id="forgotPasswordLink" href="#">Forgot password?</a></p>
+<p class="hint">Seller accounts are for listing products. Confirm your email if Supabase asks you to.</p>
+</section>
 
-  <section id="authCard" class="card">
-    <h2>Seller Account</h2>
-    <p class="subtitle">Sign in with your existing account or create a new account.</p>
+<section id="passwordResetCard" class="card hidden">
+<h2>Choose a new password</h2>
+<form id="passwordResetForm">
+<div class="field">
+<label for="newPassword">New password</label>
+<input id="newPassword" type="password" required minlength="6" autocomplete="new-password">
+</div>
+<button id="savePasswordButton" class="btn primary full" type="submit">Save New Password</button>
+</form>
+</section>
 
-    <div class="auth-tabs">
-      <button type="button" id="loginTab" class="btn selected">Log In</button>
-      <button type="button" id="signupTab" class="btn">Sign Up</button>
-    </div>
+<section id="sellerCard" class="card hidden">
+<h2>Your Seller Account</h2>
+<div class="account">Signed in as <strong id="sellerEmail"></strong></div>
+<button type="button" id="logoutButton" class="btn">Log Out</button>
+</section>
 
-    <form id="authForm">
-      <div id="nameField" class="field hidden">
-        <label for="fullName">Full name</label>
-        <input id="fullName" type="text" maxlength="100" autocomplete="name">
-      </div>
+<section id="listingCard" class="card hidden">
+<h2>Product Details</h2>
+<form id="listingForm">
+<div class="field">
+<label for="title">Product title *</label>
+<input id="title" required maxlength="120" placeholder="e.g. Gradient Infuser Bottle">
+</div>
 
-      <div class="field">
-        <label for="email">Email address</label>
-        <input id="email" type="email" required autocomplete="email"
-               placeholder="you@example.com">
-      </div>
+<div class="grid">
+<div class="field">
+<label for="price">Price *</label>
+<input id="price" type="number" min="0.01" max="999999999" step="0.01" required placeholder="e.g. 55.00">
+</div>
+<div class="field">
+<label for="sellerCountry">Seller country *</label>
+<select id="sellerCountry" required>
+<option value="AE" data-currency="AED">United Arab Emirates (AED)</option>
+<option value="US" data-currency="USD">United States (USD)</option>
+<option value="GB" data-currency="GBP">United Kingdom (GBP)</option>
+<option value="PK" data-currency="PKR">Pakistan (PKR)</option>
+<option value="IN" data-currency="INR">India (INR)</option>
+<option value="SA" data-currency="SAR">Saudi Arabia (SAR)</option>
+<option value="QA" data-currency="QAR">Qatar (QAR)</option>
+<option value="KW" data-currency="KWD">Kuwait (KWD)</option>
+<option value="BH" data-currency="BHD">Bahrain (BHD)</option>
+<option value="OM" data-currency="OMR">Oman (OMR)</option>
+<option value="EU" data-currency="EUR">Euro area (EUR)</option>
+<option value="CA" data-currency="CAD">Canada (CAD)</option>
+<option value="AU" data-currency="AUD">Australia (AUD)</option>
+<option value="NZ" data-currency="NZD">New Zealand (NZD)</option>
+<option value="CN" data-currency="CNY">China (CNY)</option>
+<option value="JP" data-currency="JPY">Japan (JPY)</option>
+<option value="KR" data-currency="KRW">South Korea (KRW)</option>
+<option value="SG" data-currency="SGD">Singapore (SGD)</option>
+<option value="MY" data-currency="MYR">Malaysia (MYR)</option>
+<option value="ID" data-currency="IDR">Indonesia (IDR)</option>
+<option value="PH" data-currency="PHP">Philippines (PHP)</option>
+<option value="TH" data-currency="THB">Thailand (THB)</option>
+<option value="TR" data-currency="TRY">Türkiye (TRY)</option>
+<option value="ZA" data-currency="ZAR">South Africa (ZAR)</option>
+<option value="NG" data-currency="NGN">Nigeria (NGN)</option>
+<option value="EG" data-currency="EGP">Egypt (EGP)</option>
+<option value="BR" data-currency="BRL">Brazil (BRL)</option>
+<option value="MX" data-currency="MXN">Mexico (MXN)</option>
+<option value="CH" data-currency="CHF">Switzerland (CHF)</option>
+</select>
+<label for="currency" style="margin-top:12px">Listing currency *</label>
+<select id="currency" required>
+<option>AED</option><option>USD</option><option>GBP</option><option>PKR</option><option>INR</option><option>SAR</option><option>QAR</option><option>KWD</option><option>BHD</option><option>OMR</option><option>EUR</option><option>CAD</option><option>AUD</option><option>NZD</option><option>CNY</option><option>JPY</option><option>KRW</option><option>SGD</option><option>MYR</option><option>IDR</option><option>PHP</option><option>THB</option><option>TRY</option><option>ZAR</option><option>NGN</option><option>EGP</option><option>BRL</option><option>MXN</option><option>CHF</option>
+</select>
+<p class="hint">Choose the currency you are actually charging buyers in.</p>
+</div>
 
-      <div class="field">
-        <label for="password">Password</label>
-        <input id="password" type="password" required minlength="6"
-               autocomplete="current-password" placeholder="At least 6 characters">
-      </div>
-
-      <button id="authButton" class="btn primary full" type="submit">Log In</button>
-    </form>
-
-    <p id="forgotPasswordRow" class="hint">
-      <a id="forgotPasswordLink" href="#">Forgot password?</a>
-    </p>
-
-    <p class="hint">
-      If you create an account, Supabase may ask you to confirm your email before
-      you can log in. Never share your password with anyone.
-    </p>
-  </section>
-
-  <section id="passwordResetCard" class="card hidden">
-    <h2>Choose a new password</h2>
-    <p class="subtitle">Enter a new password for your Quick Cart seller account.</p>
-    <form id="passwordResetForm">
-      <div class="field">
-        <label for="newPassword">New password</label>
-        <input id="newPassword" type="password" required minlength="6"
-               autocomplete="new-password" placeholder="At least 6 characters">
-      </div>
-      <button id="savePasswordButton" class="btn primary full" type="submit">
-        Save New Password
-      </button>
-    </form>
-  </section>
-
-  <section id="sellerCard" class="card hidden">
-    <h2>Your Seller Account</h2>
-    <div class="account">
-      Signed in as <strong id="sellerEmail"></strong>
-    </div>
-    <button type="button" id="logoutButton" class="btn">Log Out</button>
-  </section>
-
-  <section id="listingCard" class="card hidden">
-    <h2>Product Details</h2>
-
-    <form id="listingForm">
-      <div class="field">
-        <label for="title">Product title *</label>
-        <input id="title" required maxlength="120"
-               placeholder="e.g. Gradient Infuser Bottle">
-      </div>
-
-      <div class="grid">
-        <div class="field">
-          <label for="price">Price in your selected currency *</label>
-          <input id="price" type="number" min="0.01" max="999999999"
-                 step="0.01" required placeholder="e.g. 55.00">
-        </div>
-        <div class="field">
-          <label for="sellerCountry">Seller country *</label>
-          <select id="sellerCountry" required>
-            <option value="AE" data-currency="AED">United Arab Emirates (AED)</option>
-            <option value="US" data-currency="USD">United States (USD)</option>
-            <option value="GB" data-currency="GBP">United Kingdom (GBP)</option>
-            <option value="IN" data-currency="INR">India (INR)</option>
-            <option value="PK" data-currency="PKR">Pakistan (PKR)</option>
-            <option value="SA" data-currency="SAR">Saudi Arabia (SAR)</option>
-            <option value="QA" data-currency="QAR">Qatar (QAR)</option>
-            <option value="KW" data-currency="KWD">Kuwait (KWD)</option>
-            <option value="BH" data-currency="BHD">Bahrain (BHD)</option>
-            <option value="OM" data-currency="OMR">Oman (OMR)</option>
-            <option value="EU" data-currency="EUR">Euro area (EUR)</option>
-            <option value="CA" data-currency="CAD">Canada (CAD)</option>
-            <option value="AU" data-currency="AUD">Australia (AUD)</option>
-            <option value="NZ" data-currency="NZD">New Zealand (NZD)</option>
-            <option value="CN" data-currency="CNY">China (CNY)</option>
-            <option value="JP" data-currency="JPY">Japan (JPY)</option>
-            <option value="KR" data-currency="KRW">South Korea (KRW)</option>
-            <option value="SG" data-currency="SGD">Singapore (SGD)</option>
-            <option value="MY" data-currency="MYR">Malaysia (MYR)</option>
-            <option value="ID" data-currency="IDR">Indonesia (IDR)</option>
-            <option value="PH" data-currency="PHP">Philippines (PHP)</option>
-            <option value="TH" data-currency="THB">Thailand (THB)</option>
-            <option value="TR" data-currency="TRY">Türkiye (TRY)</option>
-            <option value="ZA" data-currency="ZAR">South Africa (ZAR)</option>
-            <option value="NG" data-currency="NGN">Nigeria (NGN)</option>
-            <option value="EG" data-currency="EGP">Egypt (EGP)</option>
-            <option value="BR" data-currency="BRL">Brazil (BRL)</option>
-            <option value="MX" data-currency="MXN">Mexico (MXN)</option>
-            <option value="CH" data-currency="CHF">Switzerland (CHF)</option>
-            <option value="SE" data-currency="SEK">Sweden (SEK)</option>
-            <option value="NO" data-currency="NOK">Norway (NOK)</option>
-            <option value="DK" data-currency="DKK">Denmark (DKK)</option>
-            <option value="PL" data-currency="PLN">Poland (PLN)</option>
-            <option value="RU" data-currency="RUB">Russia (RUB)</option>
-            <option value="BD" data-currency="BDT">Bangladesh (BDT)</option>
-            <option value="LK" data-currency="LKR">Sri Lanka (LKR)</option>
-            <option value="NP" data-currency="NPR">Nepal (NPR)</option>
-            <option value="VN" data-currency="VND">Vietnam (VND)</option>
-            <option value="KE" data-currency="KES">Kenya (KES)</option>
-            <option value="GH" data-currency="GHS">Ghana (GHS)</option>
-          </select>
-          <label for="currency" style="margin-top:12px">Listing currency *</label>
-          <select id="currency" required>
-            <option>AED</option><option>USD</option><option>GBP</option><option>INR</option><option>PKR</option><option>SAR</option><option>QAR</option><option>KWD</option><option>BHD</option><option>OMR</option><option>EUR</option><option>CAD</option><option>AUD</option><option>NZD</option><option>CNY</option><option>JPY</option><option>KRW</option><option>SGD</option><option>MYR</option><option>IDR</option><option>PHP</option><option>THB</option><option>TRY</option><option>ZAR</option><option>NGN</option><option>EGP</option><option>BRL</option><option>MXN</option><option>CHF</option><option>SEK</option><option>NOK</option><option>DKK</option><option>PLN</option><option>RUB</option><option>BDT</option><option>LKR</option><option>NPR</option><option>VND</option><option>KES</option><option>GHS</option>
-          </select>
-          <p class="hint">Choose the currency you are actually charging buyers in. Prices shown in other currencies are estimates.</p>
-        </div>
-
-        <div class="field">
-          <label for="category">Category *</label>
-          <select id="category" required>
-          
+<div class="field">
+<label for="category">Category *</label>
+<select id="category" required>
 <option value="">Choose category</option>
 <option>Health &amp; Personal Care</option>
 <option>Beauty &amp; Cosmetics</option>
@@ -362,614 +187,396 @@
 <option>Arts, Crafts &amp; Hobbies</option>
 <option>Travel Accessories</option>
 <option>Other</option>
+</select>
+</div>
 
-          </select>
-        </div>
+<div class="field">
+<label for="condition">Condition *</label>
+<select id="condition" required>
+<option value="">Choose condition</option>
+<option>New</option><option>Like New</option><option>Good</option><option>Fair</option><option>Used</option>
+</select>
+</div>
 
-        <div class="field">
-          <label for="condition">Condition *</label>
-          <select id="condition" required>
-            <option value="">Choose condition</option>
-            <option>New</option>
-            <option>Like New</option>
-            <option>Good</option>
-            <option>Fair</option>
-            <option>Used</option>
-          </select>
-        </div>
+<div class="field">
+<label for="location">Location *</label>
+<input id="location" required maxlength="100" placeholder="e.g. Abu Dhabi, UAE">
+</div>
+</div>
 
-        <div class="field">
-          <label for="location">Location *</label>
-          <input id="location" required maxlength="100"
-                 placeholder="e.g. Abu Dhabi, UAE">
-        </div>
-      </div>
+<div class="field">
+<label for="description">Product description</label>
+<textarea id="description" maxlength="5000" placeholder="Describe your product and its features..."></textarea>
+</div>
 
-      <div class="field">
-        <label for="description">Product description</label>
-        <textarea id="description" maxlength="5000"
-                  placeholder="Describe your product and its features..."></textarea>
-      </div>
+<div class="field">
+<label>Product photos *</label>
+<div class="upload">
+<div id="mainPhotoArea">
+<button type="button" id="addMainPhoto" class="btn primary full">+ Add Main Photo</button>
+</div>
+<div id="extraPhotoArea" class="hidden">
+<button type="button" id="addAnotherPhoto" class="btn full">+ Add Another Photo</button>
+</div>
+<input id="mainPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+<input id="extraPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+<p class="hint">Add 1–15 JPG, PNG or WebP photos, up to 5 MB each.</p>
+<div id="preview" class="preview"></div>
+</div>
+</div>
 
-      <div class="field">
-        <label>Product photos *</label>
-        <div class="upload">
-          <div id="mainPhotoArea">
-            <button type="button" id="addMainPhoto" class="btn primary full">+ Add Main Photo</button>
-          </div>
-          <div id="extraPhotoArea" class="hidden">
-            <button type="button" id="addAnotherPhoto" class="btn full">+ Add Another Photo</button>
-          </div>
-          <input id="mainPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-          <input id="extraPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-          <p class="hint">Add 1–15 JPG, PNG, or WebP photos, up to 5 MB each. Add photos one at a time. The first photo is the main photo.</p>
-          <div id="preview" class="preview"></div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>
-          <input id="allowOffers" type="checkbox" style="width:auto">
-          Allow buyers to make offers
-        </label>
-      </div>
-
-      <button id="publishButton" type="submit" class="btn primary full">
-        Publish Listing
-      </button>
-    </form>
-  </section>
+<div class="field">
+<label><input id="allowOffers" type="checkbox" style="width:auto"> Allow buyers to make offers</label>
+</div>
+<button id="publishButton" type="submit" class="btn primary full">Publish Listing</button>
+</form>
+</section>
 </main>
-
 <footer>Quick Cart — Buy Smart. Sell Easy.</footer>
 
 <script>
-  const SUPABASE_URL = "https://dgnkmkyueqgbiahztuux.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
+const SUPABASE_URL = "https://dgnkmkyueqgbiahztuux.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4j_ZqL-Mw_nH9oguTAi68g_mM-FHFT_";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+let authMode = "login";
+let isPasswordRecovery = false;
+let selectedPhotos = [];
+let previewUrls = [];
 
-  const pageMessage = document.getElementById("pageMessage");
-  const authCard = document.getElementById("authCard");
-  const passwordResetCard = document.getElementById("passwordResetCard");
-  const passwordResetForm = document.getElementById("passwordResetForm");
-  const sellerCard = document.getElementById("sellerCard");
-  const listingCard = document.getElementById("listingCard");
-  const authForm = document.getElementById("authForm");
-  const listingForm = document.getElementById("listingForm");
-  const forgotPasswordRow = document.getElementById("forgotPasswordRow");
-  const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+function showMessage(message,type){
+  $("pageMessage").textContent = message;
+  $("pageMessage").className = "message " + type;
+}
+function clearMessage(){
+  $("pageMessage").textContent = "";
+  $("pageMessage").className = "message";
+}
 
-  let authMode = "login";
-  let isPasswordRecovery = false;
+function setAuthMode(mode){
+  authMode = mode;
+  $("loginTab").classList.toggle("selected",mode==="login");
+  $("signupTab").classList.toggle("selected",mode==="signup");
+  $("nameField").classList.toggle("hidden",mode!=="signup");
+  $("forgotPasswordRow").classList.toggle("hidden",mode!=="login");
+  $("password").autocomplete = mode==="login" ? "current-password" : "new-password";
+  $("authButton").textContent = mode==="login" ? "Log In" : "Create Seller Account";
+  $("fullName").required = mode==="signup";
+  clearMessage();
+}
+$("loginTab").addEventListener("click",()=>setAuthMode("login"));
+$("signupTab").addEventListener("click",()=>setAuthMode("signup"));
 
-  function showMessage(message, type) {
-    pageMessage.textContent = message;
-    pageMessage.className = "message " + type;
+async function updateSessionView(){
+  $("authCard").classList.add("hidden");
+  $("sellerCard").classList.add("hidden");
+  $("listingCard").classList.add("hidden");
+
+  const {data,error} = await db.auth.getSession();
+  if(error){showMessage(error.message,"error");return;}
+
+  const session = data.session;
+  if(!session){
+    $("authCard").classList.remove("hidden");
+    return;
   }
 
-  function clearMessage() {
-    pageMessage.textContent = "";
-    pageMessage.className = "message";
+  const {data:profile,error:profileError} = await db
+    .from("profiles")
+    .select("role")
+    .eq("id",session.user.id)
+    .maybeSingle();
+
+  if(profileError){
+    showMessage("Could not verify seller permissions: "+profileError.message,"error");
+    return;
   }
 
-  function setAuthMode(mode) {
-    authMode = mode;
-
-    const loginTab = document.getElementById("loginTab");
-    const signupTab = document.getElementById("signupTab");
-    const nameField = document.getElementById("nameField");
-    const passwordInput = document.getElementById("password");
-    const authButton = document.getElementById("authButton");
-
-    loginTab.classList.toggle("selected", mode === "login");
-    signupTab.classList.toggle("selected", mode === "signup");
-    nameField.classList.toggle("hidden", mode !== "signup");
-    forgotPasswordRow.classList.toggle("hidden", mode !== "login");
-
-    passwordInput.autocomplete =
-      mode === "login" ? "current-password" : "new-password";
-
-    authButton.textContent =
-      mode === "login" ? "Log In" : "Create Account";
-
-    clearMessage();
+  if(!profile){
+    showMessage("Your profile is missing. Please contact the administrator.","error");
+    return;
   }
 
-  document.getElementById("loginTab").addEventListener("click", function() {
-    setAuthMode("login");
-  });
-
-  document.getElementById("signupTab").addEventListener("click", function() {
-    setAuthMode("signup");
-  });
-
-  async function updateSessionView() {
-    const result = await db.auth.getSession();
-
-    if (result.error) {
-      showMessage(result.error.message, "error");
-      return;
-    }
-
-    const session = result.data.session;
-
-    if (session && session.user) {
-      authCard.classList.add("hidden");
-      passwordResetCard.classList.add("hidden");
-      sellerCard.classList.remove("hidden");
-      listingCard.classList.remove("hidden");
-
-      document.getElementById("sellerEmail").textContent =
-        session.user.email || "";
-    } else {
-      authCard.classList.remove("hidden");
-      sellerCard.classList.add("hidden");
-      listingCard.classList.add("hidden");
-    }
+  if(profile.role!=="seller" && profile.role!=="admin"){
+    showMessage("This is a Buyer account. Please use a Seller account to publish products.","error");
+    return;
   }
 
-  forgotPasswordLink.addEventListener("click", async function(event) {
-    event.preventDefault();
-    clearMessage();
+  $("sellerEmail").textContent = session.user.email || "";
+  $("sellerCard").classList.remove("hidden");
+  $("listingCard").classList.remove("hidden");
+}
 
-    const email = document.getElementById("email").value.trim();
+$("authForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  clearMessage();
+  const button = $("authButton");
+  button.disabled = true;
+  button.textContent = "Please wait…";
 
-    if (!email) {
-      showMessage("Please enter your email address first.", "error");
-      document.getElementById("email").focus();
-      return;
-    }
+  const email = $("email").value.trim();
+  const password = $("password").value;
 
-    forgotPasswordLink.textContent = "Sending reset email…";
-    forgotPasswordLink.style.pointerEvents = "none";
-
-    try {
-      const result = await db.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + window.location.pathname
-      });
-
-      if (result.error) throw result.error;
-
-      showMessage(
-        "If an account exists for this email, a password-reset link will be sent. Check your inbox and spam folder.",
-        "success"
-      );
-    } catch (error) {
-      console.error("Password reset request error:", error);
-      showMessage(
-        error.message || "Could not send the password-reset email.",
-        "error"
-      );
-    } finally {
-      forgotPasswordLink.textContent = "Forgot password?";
-      forgotPasswordLink.style.pointerEvents = "";
-    }
-  });
-
-  passwordResetForm.addEventListener("submit", async function(event) {
-    event.preventDefault();
-    clearMessage();
-
-    const button = document.getElementById("savePasswordButton");
-    const newPassword = document.getElementById("newPassword").value;
-
-    button.disabled = true;
-    button.textContent = "Saving…";
-
-    try {
-      if (!isPasswordRecovery) {
-        throw new Error(
-          "Please open the newest password-reset link from your email first."
-        );
-      }
-
-      const result = await db.auth.updateUser({ password: newPassword });
-
-      if (result.error) throw result.error;
-
-      isPasswordRecovery = false;
-      passwordResetForm.reset();
-      passwordResetCard.classList.add("hidden");
-
+  try{
+    if(authMode==="login"){
+      const {error} = await db.auth.signInWithPassword({email,password});
+      if(error) throw error;
       await updateSessionView();
+      if(!$("listingCard").classList.contains("hidden")){
+        showMessage("You are logged in to your seller account.","success");
+      }
+    }else{
+      const fullName = $("fullName").value.trim();
+      if(!fullName) throw new Error("Please enter your full name.");
 
-      showMessage(
-        "Your password has been updated. You can now continue using Quick Cart.",
-        "success"
-      );
-    } catch (error) {
-      console.error("Password update error:", error);
-      showMessage(error.message || "Could not update your password.", "error");
-    } finally {
-      button.disabled = false;
-      button.textContent = "Save New Password";
-    }
-  });
-
-  authForm.addEventListener("submit", async function(event) {
-    event.preventDefault();
-    clearMessage();
-
-    const button = document.getElementById("authButton");
-
-    button.disabled = true;
-    button.textContent = "Please wait…";
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    try {
-      if (authMode === "login") {
-        const result = await db.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (result.error) throw result.error;
-
-        authForm.reset();
-        await updateSessionView();
-
-        showMessage(
-          "You are logged in. You can now publish a listing.",
-          "success"
-        );
-      } else {
-        const fullName = document.getElementById("fullName").value.trim();
-
-        const result = await db.auth.signUp({
-          email: email,
-          password: password,
-          options: {
-            data: { full_name: fullName }
+      const {data,error} = await db.auth.signUp({
+        email,password,
+        options:{
+          data:{
+            full_name:fullName,
+            requested_role:"seller"
           }
-        });
-
-        if (result.error) throw result.error;
-
-        if (result.data.session) {
-          authForm.reset();
-          await updateSessionView();
-          showMessage("Account created. You can now continue.", "success");
-        } else {
-          showMessage(
-            "Account created. Check your email for a confirmation link. After confirming, return here and log in.",
-            "success"
-          );
-          setAuthMode("login");
         }
-      }
-    } catch (error) {
-      console.error("Authentication error:", error);
-      showMessage(error.message || "Authentication failed.", "error");
-    } finally {
-      button.disabled = false;
-      button.textContent =
-        authMode === "login" ? "Log In" : "Create Account";
-    }
-  });
-
-  document.getElementById("logoutButton").addEventListener("click", async function() {
-    const result = await db.auth.signOut();
-
-    if (result.error) {
-      showMessage("Could not log out: " + result.error.message, "error");
-      return;
-    }
-
-    await updateSessionView();
-    showMessage("You have logged out.", "success");
-  });
-
-  const sellerCountry = document.getElementById("sellerCountry");
-  const sellerCurrency = document.getElementById("currency");
-  sellerCountry.addEventListener("change", function() {
-    const option = sellerCountry.options[sellerCountry.selectedIndex];
-    const currency = option && option.dataset.currency;
-    if (currency) sellerCurrency.value = currency;
-  });
-  sellerCurrency.value = "AED";
-
-  const mainPhotoInput = document.getElementById("mainPhotoInput");
-  const extraPhotoInput = document.getElementById("extraPhotoInput");
-  const addMainPhoto = document.getElementById("addMainPhoto");
-  const addAnotherPhoto = document.getElementById("addAnotherPhoto");
-  const mainPhotoArea = document.getElementById("mainPhotoArea");
-  const extraPhotoArea = document.getElementById("extraPhotoArea");
-  const preview = document.getElementById("preview");
-  let selectedPhotos = [];
-  let previewUrls = [];
-
-  addMainPhoto.addEventListener("click", function() {
-    mainPhotoInput.click();
-  });
-
-  addAnotherPhoto.addEventListener("click", function() {
-    extraPhotoInput.click();
-  });
-
-  function addSelectedPhoto(file) {
-    clearMessage();
-    if (!file) return;
-
-    if (selectedPhotos.length >= 15) {
-      showMessage("You can add a maximum of 15 photos.", "error");
-      return;
-    }
-
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
-      showMessage("Choose a JPG, PNG, or WebP photo no larger than 5 MB.", "error");
-      return;
-    }
-
-    selectedPhotos.push(file);
-    renderPhotoPreviews();
-  }
-
-  mainPhotoInput.addEventListener("change", function() {
-    addSelectedPhoto(mainPhotoInput.files && mainPhotoInput.files[0]);
-    mainPhotoInput.value = "";
-  });
-
-  extraPhotoInput.addEventListener("change", function() {
-    addSelectedPhoto(extraPhotoInput.files && extraPhotoInput.files[0]);
-    extraPhotoInput.value = "";
-  });
-
-  function renderPhotoPreviews() {
-    previewUrls.forEach(function(url) { URL.revokeObjectURL(url); });
-    previewUrls = [];
-    preview.replaceChildren();
-    mainPhotoArea.classList.toggle("hidden", selectedPhotos.length > 0);
-    extraPhotoArea.classList.toggle("hidden", selectedPhotos.length === 0 || selectedPhotos.length >= 15);
-
-    selectedPhotos.forEach(function(file, index) {
-      const item = document.createElement("div");
-      item.className = "preview-item" + (index === 0 ? " main-photo" : "");
-      const image = document.createElement("img");
-      image.alt = index === 0 ? "Main product photo preview" : "Additional product photo preview";
-      image.src = URL.createObjectURL(file);
-      previewUrls.push(image.src);
-
-      const label = document.createElement("span");
-      label.className = "photo-label";
-      label.textContent = index === 0 ? "Main photo" : "Photo " + (index + 1);
-
-      const removeButton = document.createElement("button");
-      removeButton.type = "button";
-      removeButton.className = "btn remove-photo";
-      removeButton.textContent = "Remove";
-      removeButton.addEventListener("click", function() {
-        selectedPhotos.splice(index, 1);
-        renderPhotoPreviews();
       });
+      if(error) throw error;
 
-      item.appendChild(image);
-      item.appendChild(label);
-      item.appendChild(removeButton);
-      preview.appendChild(item);
-    });
+      if(data.session){
+        await updateSessionView();
+        if(!$("listingCard").classList.contains("hidden")){
+          showMessage("Seller account created successfully.","success");
+        }
+      }else{
+        showMessage("Account created. Please confirm your email, then return here and log in.","success");
+        setAuthMode("login");
+      }
+    }
+  }catch(error){
+    showMessage(error.message || "Authentication failed.","error");
+  }finally{
+    button.disabled = false;
+    button.textContent = authMode==="login" ? "Log In" : "Create Seller Account";
   }
+});
 
-  listingForm.addEventListener("submit", async function(event) {
-    event.preventDefault();
-    clearMessage();
+$("forgotPasswordLink").addEventListener("click",async event=>{
+  event.preventDefault();
+  const email = $("email").value.trim();
+  if(!email){showMessage("Please enter your email address first.","error");return;}
 
-    const publishButton = document.getElementById("publishButton");
-    publishButton.disabled = true;
-    publishButton.textContent = "Publishing…";
+  try{
+    const {error} = await db.auth.resetPasswordForEmail(email,{
+      redirectTo:window.location.origin+window.location.pathname
+    });
+    if(error) throw error;
+    showMessage("If this account exists, a password reset email will be sent. Check your inbox and spam folder.","success");
+  }catch(error){showMessage(error.message,"error");}
+});
 
-    let savedListing = null;
-    let photoUploadFailed = false;
+$("passwordResetForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button = $("savePasswordButton");
+  button.disabled = true;
+  try{
+    if(!isPasswordRecovery) throw new Error("Please open the password reset link from your email first.");
+    const {error} = await db.auth.updateUser({password:$("newPassword").value});
+    if(error) throw error;
+    isPasswordRecovery = false;
+    $("passwordResetForm").reset();
+    $("passwordResetCard").classList.add("hidden");
+    await updateSessionView();
+    showMessage("Your password has been updated.","success");
+  }catch(error){showMessage(error.message,"error");}
+  finally{button.disabled=false;}
+});
 
-    try {
-      const sessionResult = await db.auth.getSession();
+$("logoutButton").addEventListener("click",async()=>{
+  const {error} = await db.auth.signOut();
+  if(error){showMessage(error.message,"error");return;}
+  await updateSessionView();
+  showMessage("You have logged out.","success");
+});
 
-      if (sessionResult.error) throw sessionResult.error;
+$("sellerCountry").addEventListener("change",()=>{
+  const option = $("sellerCountry").selectedOptions[0];
+  if(option.dataset.currency) $("currency").value=option.dataset.currency;
+});
+$("currency").value="AED";
 
-      const user = sessionResult.data.session &&
-        sessionResult.data.session.user;
+const mainPhotoInput=$("mainPhotoInput");
+const extraPhotoInput=$("extraPhotoInput");
 
-      if (!user) {
-        throw new Error("Please log in before publishing a listing.");
-      }
+$("addMainPhoto").addEventListener("click",()=>mainPhotoInput.click());
+$("addAnotherPhoto").addEventListener("click",()=>extraPhotoInput.click());
 
-      const { data: profile, error: profileError } = await db
-        .from("profiles")
-        .select("id, role")
-        .eq("id", user.id)
-        .maybeSingle();
+function addSelectedPhoto(file){
+  clearMessage();
+  if(!file)return;
+  if(selectedPhotos.length>=15){showMessage("Maximum 15 photos allowed.","error");return;}
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024){
+    showMessage("Choose JPG, PNG or WebP photos up to 5 MB each.","error");return;
+  }
+  selectedPhotos.push(file);
+  renderPhotoPreviews();
+}
+mainPhotoInput.addEventListener("change",()=>{
+  addSelectedPhoto(mainPhotoInput.files[0]);
+  mainPhotoInput.value="";
+});
+extraPhotoInput.addEventListener("change",()=>{
+  addSelectedPhoto(extraPhotoInput.files[0]);
+  extraPhotoInput.value="";
+});
 
-      if (profileError) {
-        throw new Error(
-          "Could not verify your seller profile: " + profileError.message
-        );
-      }
+function renderPhotoPreviews(){
+  previewUrls.forEach(URL.revokeObjectURL);
+  previewUrls=[];
+  $("preview").replaceChildren();
+  $("mainPhotoArea").classList.toggle("hidden",selectedPhotos.length>0);
+  $("extraPhotoArea").classList.toggle("hidden",selectedPhotos.length===0||selectedPhotos.length>=15);
 
-      if (!profile) {
-        throw new Error(
-          "Your seller profile is missing. Please ask us to configure profile creation before publishing."
-        );
-      }
+  selectedPhotos.forEach((file,index)=>{
+    const item=document.createElement("div");
+    item.className="preview-item"+(index===0?" main-photo":"");
+    const img=document.createElement("img");
+    img.alt="Product photo";
+    img.src=URL.createObjectURL(file);
+    previewUrls.push(img.src);
 
-      if (profile.role !== "seller" && profile.role !== "admin") {
-        throw new Error("This account does not have seller permission.");
-      }
+    const label=document.createElement("span");
+    label.className="photo-label";
+    label.textContent=index===0?"Main photo":"Photo "+(index+1);
 
-      const title = document.getElementById("title").value.trim();
-      const price = Number(document.getElementById("price").value);
-      const category = document.getElementById("category").value;
-      const condition = document.getElementById("condition").value;
-      const location = document.getElementById("location").value.trim();
-      const description = document.getElementById("description").value.trim();
-      const allowOffers = document.getElementById("allowOffers").checked;
-      const files = [...selectedPhotos];
-
-      if (
-        !title || !category || !condition || !location ||
-        !Number.isFinite(price) || price <= 0
-      ) {
-        throw new Error(
-          "Please complete all required fields with valid values."
-        );
-      }
-
-      if (files.length < 1 || files.length > 15) {
-        throw new Error("Please add between 1 and 15 photos before publishing.");
-      }
-
-      for (const file of files) {
-        if (
-          !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
-          file.size > 5 * 1024 * 1024
-        ) {
-          throw new Error(
-            "Each photo must be JPG, PNG, or WebP and no larger than 5 MB."
-          );
-        }
-      }
-
-      const listingData = {
-        seller_id: user.id,
-        title: title,
-        description: description || null,
-        price: price,
-        currency: document.getElementById("currency").value,
-        condition: condition,
-        location: location,
-        allow_offers: allowOffers,
-        status: "Active",
-        category: category
-      };
-
-      const insertResult = await db
-        .from("listings")
-        .insert(listingData)
-        .select("id")
-        .single();
-
-      if (insertResult.error) {
-        throw new Error(
-          "Listing could not be saved: " + insertResult.error.message
-        );
-      }
-
-      savedListing = insertResult.data;
-
-      const imageRows = [];
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-
-        const extension = file.type === "image/png" ? "png" :
-          file.type === "image/webp" ? "webp" : "jpg";
-
-        const path = user.id + "/" + savedListing.id + "/" +
-          crypto.randomUUID() + "." + extension;
-
-        const uploadResult = await db.storage
-          .from("listing-images")
-          .upload(path, file, {
-            cacheControl: "3600",
-            upsert: false,
-            contentType: file.type
-          });
-
-        if (uploadResult.error) {
-          photoUploadFailed = true;
-
-          throw new Error(
-            "The listing was created, but its photo could not be uploaded: " +
-            uploadResult.error.message
-          );
-        }
-
-        const publicUrl = db.storage
-          .from("listing-images")
-          .getPublicUrl(path).data.publicUrl;
-
-        imageRows.push({
-          listing_id: savedListing.id,
-          image_url: publicUrl,
-          display_order: i
-        });
-      }
-
-      if (imageRows.length) {
-        const imageResult = await db
-          .from("listing_images")
-          .insert(imageRows);
-
-        if (imageResult.error) {
-          photoUploadFailed = true;
-
-          throw new Error(
-            "The listing was created, but its photo record could not be saved: " +
-            imageResult.error.message
-          );
-        }
-      }
-
-      listingForm.reset();
-      selectedPhotos = [];
+    const remove=document.createElement("button");
+    remove.type="button";
+    remove.className="btn remove-photo";
+    remove.textContent="Remove";
+    remove.addEventListener("click",()=>{
+      selectedPhotos.splice(index,1);
       renderPhotoPreviews();
+    });
+    item.append(img,label,remove);
+    $("preview").append(item);
+  });
+}
 
-      showMessage("Your listing was published successfully!", "success");
+$("listingForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  clearMessage();
+  const button=$("publishButton");
+  button.disabled=true;
+  button.textContent="Publishing…";
+  let savedListing=null;
+  let photoUploadFailed=false;
 
-      const link = document.createElement("a");
-      link.href = "./listing.html?id=" +
-        encodeURIComponent(savedListing.id);
-      link.textContent = " View your listing";
-      link.style.display = "inline-block";
-      link.style.marginTop = "10px";
-      link.style.color = "#ea580c";
-      link.style.fontWeight = "bold";
+  try{
+    const {data:sessionData,error:sessionError}=await db.auth.getSession();
+    if(sessionError)throw sessionError;
+    const user=sessionData.session?.user;
+    if(!user)throw new Error("Please log in first.");
 
-      pageMessage.appendChild(document.createElement("br"));
-      pageMessage.appendChild(link);
+    const {data:profile,error:profileError}=await db
+      .from("profiles").select("id,role").eq("id",user.id).maybeSingle();
 
-    } catch (error) {
-      console.error("Publishing error:", error);
+    if(profileError)throw new Error("Could not verify seller permissions: "+profileError.message);
+    if(!profile || (profile.role!=="seller" && profile.role!=="admin")){
+      throw new Error("This account does not have seller permission.");
+    }
 
-      let text = error.message || "Something went wrong.";
+    const title=$("title").value.trim();
+    const price=Number($("price").value);
+    const category=$("category").value;
+    const condition=$("condition").value;
+    const location=$("location").value.trim();
+    const files=[...selectedPhotos];
 
-      if (savedListing && photoUploadFailed) {
-        text +=
-          " Your listing exists, but photo saving needs to be fixed. Do not submit it again yet.";
+    if(!title||!category||!condition||!location||!Number.isFinite(price)||price<=0){
+      throw new Error("Please complete all required fields.");
+    }
+    if(files.length<1||files.length>15)throw new Error("Please add 1–15 product photos.");
+
+    const listingData={
+      seller_id:user.id,
+      title,
+      description:$("description").value.trim()||null,
+      price,
+      currency:$("currency").value,
+      condition,
+      location,
+      allow_offers:$("allowOffers").checked,
+      status:"Active",
+      category
+    };
+
+    const {data:listing,error:insertError}=await db
+      .from("listings").insert(listingData).select("id").single();
+
+    if(insertError)throw new Error("Listing could not be saved: "+insertError.message);
+    savedListing=listing;
+
+    const imageRows=[];
+    for(let i=0;i<files.length;i++){
+      const file=files[i];
+      const extension=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg";
+      const path=user.id+"/"+listing.id+"/"+crypto.randomUUID()+"."+extension;
+
+      const {error:uploadError}=await db.storage.from("listing-images").upload(path,file,{
+        cacheControl:"3600",upsert:false,contentType:file.type
+      });
+      if(uploadError){
+        photoUploadFailed=true;
+        throw new Error("Listing created, but photo upload failed: "+uploadError.message);
       }
 
-      showMessage(text, "error");
-    } finally {
-      publishButton.disabled = false;
-      publishButton.textContent = "Publish Listing";
-    }
-  });
-
-  db.auth.onAuthStateChange(function(event) {
-    if (event === "PASSWORD_RECOVERY") {
-      isPasswordRecovery = true;
-
-      authCard.classList.add("hidden");
-      sellerCard.classList.add("hidden");
-      listingCard.classList.add("hidden");
-      passwordResetCard.classList.remove("hidden");
-
-      showMessage(
-        "Password reset verified. Choose your new password below.",
-        "success"
-      );
-
-      return;
+      const publicUrl=db.storage.from("listing-images").getPublicUrl(path).data.publicUrl;
+      imageRows.push({listing_id:listing.id,image_url:publicUrl,display_order:i});
     }
 
-    if (!isPasswordRecovery) {
-      updateSessionView();
+    const {error:imageError}=await db.from("listing_images").insert(imageRows);
+    if(imageError){
+      photoUploadFailed=true;
+      throw new Error("Listing created, but photo records could not be saved: "+imageError.message);
     }
-  });
 
-  setAuthMode("login");
-  updateSessionView();
+    $("listingForm").reset();
+    selectedPhotos=[];
+    renderPhotoPreviews();
+    $("currency").value="AED";
+    showMessage("Your listing was published successfully!","success");
+
+    const link=document.createElement("a");
+    link.href="./listing.html?id="+encodeURIComponent(listing.id);
+    link.textContent=" View your listing";
+    link.style.cssText="display:inline-block;margin-top:10px;color:#ea580c;font-weight:bold";
+    $("pageMessage").append(document.createElement("br"),link);
+
+  }catch(error){
+    let message=error.message||"Something went wrong.";
+    if(savedListing&&photoUploadFailed){
+      message+=" Your listing exists, but photo saving needs attention. Do not submit again yet.";
+    }
+    showMessage(message,"error");
+  }finally{
+    button.disabled=false;
+    button.textContent="Publish Listing";
+  }
+});
+
+db.auth.onAuthStateChange(event=>{
+  if(event==="PASSWORD_RECOVERY"){
+    isPasswordRecovery=true;
+    $("authCard").classList.add("hidden");
+    $("sellerCard").classList.add("hidden");
+    $("listingCard").classList.add("hidden");
+    $("passwordResetCard").classList.remove("hidden");
+    showMessage("Password reset verified. Choose your new password.","success");
+  }else if(!isPasswordRecovery){
+    updateSessionView();
+  }
+});
+
+setAuthMode("login");
+updateSessionView();
 </script>
 </body>
 </html>
